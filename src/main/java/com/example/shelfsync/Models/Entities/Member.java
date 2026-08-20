@@ -4,6 +4,8 @@ import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -29,7 +31,7 @@ public class Member {
     private String password;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Loan> loans;
+    private Set<Loan> loans = new HashSet<>();
 
     @Column(name = "fine")
     private int fine = 0;

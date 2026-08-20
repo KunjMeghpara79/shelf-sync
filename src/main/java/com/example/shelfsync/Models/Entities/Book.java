@@ -3,6 +3,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -26,5 +28,5 @@ public class Book {
     private int availableQuantity;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Loan> loans;
+    private Set<Loan> loans = new HashSet<>();
 }
