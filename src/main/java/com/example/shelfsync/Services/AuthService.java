@@ -1,4 +1,7 @@
 package com.example.shelfsync.Services;
+import com.example.shelfsync.Exceptions.InvalidPasswordException;
+import com.example.shelfsync.Exceptions.MemberAlreadyExistsException;
+import com.example.shelfsync.Exceptions.MemberNotFoundException;
 import com.example.shelfsync.Mappers.MemberMapper;
 import com.example.shelfsync.Models.DTOs.LoginRequestDto;
 import com.example.shelfsync.Models.DTOs.MemberRequestDto;
@@ -23,6 +26,7 @@ public class AuthService {
     }
 
     public MemberResponseDto registerMember(MemberRequestDto memberRequestDto){
+        if(memberRepository.existsByMemberEmail(memberRequestDto.memberEmail())) throw new MemberAlreadyExistsException("Member Already exists!");
         Member member = memberMapper.memberRequestDtoToMember(memberRequestDto);
         member.setPassword(passwordEncoder.encode(memberRequestDto.password()));
         memberRepository.save(member);
@@ -30,12 +34,10 @@ public class AuthService {
     }
 
     public String loginValidation(LoginRequestDto loginRequestDto) throws Exception {
-        Member member = memberRepository.findByMemberEmail(loginRequestDto.email()).orElseThrow();
-
+        Member member = memberRepository.findByMemberEmail(loginRequestDto.email()).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
         if (!passwordEncoder.matches(loginRequestDto.password(),member.getPassword())) {
-            throw new RuntimeException("Invalid email or password!");
+            throw new InvalidPasswordException("Invalid password!");
         }
-
         // 3. Generate token if credentials match
         String token = jwtService.generateToken(loginRequestDto.email());
         return token;

@@ -1,4 +1,5 @@
 package com.example.shelfsync.Security;
+import com.example.shelfsync.Exceptions.MemberNotFoundException;
 import com.example.shelfsync.Models.Entities.Member;
 import com.example.shelfsync.Repositories.MemberRepository;
 import org.springframework.context.annotation.Primary;
@@ -18,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member member = memberRepository.findByMemberEmail(username).orElseThrow();
+        Member member = memberRepository.findByMemberEmail(username).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
         return org.springframework.security.core.userdetails.User.builder()
                 .username(member.getMemberEmail())
                 .password(member.getPassword())

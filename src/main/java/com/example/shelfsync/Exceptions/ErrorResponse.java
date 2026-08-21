@@ -1,4 +1,4 @@
-package com.example.shelfsync;
+package com.example.shelfsync.Exceptions;
 
 public class ErrorResponse {
     public int getStatusCode() {

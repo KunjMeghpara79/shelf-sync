@@ -1,5 +1,5 @@
 package com.example.shelfsync.Security;
-import com.example.shelfsync.ErrorResponse;
+import com.example.shelfsync.Exceptions.ErrorResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
