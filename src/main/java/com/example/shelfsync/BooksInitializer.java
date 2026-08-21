@@ -1,10 +1,8 @@
 package com.example.shelfsync;
-
 import com.example.shelfsync.Models.Entities.Book;
 import com.example.shelfsync.Repositories.BookRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 
 @Component
