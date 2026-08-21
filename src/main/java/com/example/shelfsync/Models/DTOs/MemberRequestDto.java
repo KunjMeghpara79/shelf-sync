@@ -1,5 +1,4 @@
 package com.example.shelfsync.Models.DTOs;
-
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

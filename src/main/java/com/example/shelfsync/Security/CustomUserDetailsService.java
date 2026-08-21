@@ -1,5 +1,4 @@
 package com.example.shelfsync.Security;
-
 import com.example.shelfsync.Models.Entities.Member;
 import com.example.shelfsync.Repositories.MemberRepository;
 import org.springframework.context.annotation.Primary;
