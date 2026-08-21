@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-
     private final MemberRepository memberRepository;
 
     public CustomUserDetailsService(MemberRepository memberRepository) {
@@ -24,12 +23,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         return org.springframework.security.core.userdetails.User.builder()
                 .username(member.getMemberEmail())
                 .password(member.getPassword())
-                /*
-                Spring's userdetails class contains authorities so it can contain both roles and permissions
-                so to differentiate these two we have historical convention of adding "ROLE_" before role.
-                spring security will automatically add "ROLE_" while executing role based access endpoints or methods.
-                */
                 .build();
     }
-
 }
