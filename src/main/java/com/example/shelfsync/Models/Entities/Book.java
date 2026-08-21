@@ -28,4 +28,10 @@ public class Book {
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Loan> loans = new HashSet<>();
+
+    public Book(String bookName,int totalQuantity,int availableQuantity){
+        this.bookName = bookName;
+        this.availableQuantity=availableQuantity;
+        this.totalQuantity = totalQuantity;
+    }
 }
