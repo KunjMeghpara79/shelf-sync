@@ -33,13 +33,12 @@ public class AuthService {
         return memberMapper.memberToMemberResponseDto(member);
     }
 
-    public String loginValidation(LoginRequestDto loginRequestDto) throws Exception {
+    public String loginValidation(LoginRequestDto loginRequestDto) {
         Member member = memberRepository.findByMemberEmail(loginRequestDto.email()).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
         if (!passwordEncoder.matches(loginRequestDto.password(),member.getPassword())) {
             throw new InvalidPasswordException("Invalid password!");
         }
         // 3. Generate token if credentials match
-        String token = jwtService.generateToken(loginRequestDto.email());
-        return token;
+        return jwtService.generateToken(loginRequestDto.email());
     }
 }

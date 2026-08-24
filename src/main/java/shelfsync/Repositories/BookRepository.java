@@ -1,8 +1,7 @@
 package shelfsync.Repositories;
 
-import shelfsync.Models.Entities.BookData;
 import org.springframework.data.jpa.repository.JpaRepository;
+import shelfsync.Models.Entities.Book;
 
-public interface BookRepository extends JpaRepository<BookData,Integer> {
-
+public interface BookRepository extends JpaRepository<Book,Integer> {
 }

@@ -1,34 +1,60 @@
 package shelfsync;
+import shelfsync.Models.Entities.Book;
 import shelfsync.Models.Entities.BookData;
-import shelfsync.Repositories.BookRepository;
+import shelfsync.Repositories.BookDataRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import shelfsync.Repositories.BookRepository;
+
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 @Component
 public class BooksInitializer implements CommandLineRunner {
 
+    private final BookDataRepository bookDataRepository;
     private final BookRepository bookRepository;
+    public BooksInitializer(BookDataRepository bookDataRepository, BookRepository bookRepository) {
+        this.bookDataRepository = bookDataRepository;
 
-    public BooksInitializer(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
     }
 
     @Override
-    public void run(String... args) throws Exception {
-        List<BookData> bookDataList = List.of(
-                new BookData("The Midnight Library", 10, 10),
-                new BookData("Shadow of the Wind", 5, 5),
-                new BookData("Echoes of Eternity", 12, 12),
-                new BookData("Whispers in the Dark", 7, 7),
-                new BookData("The Alchemist's Secret", 15, 15),
-                new BookData("Chronicles of Eldoria", 8, 8),
-                new BookData("Beneath Crimson Skies", 4, 4),
-                new BookData("The Silent Patient", 20, 20),
-                new BookData("Starlight Odyssey", 9, 9),
-                new BookData("Secrets of the Forgotten", 6, 6)
+    public void run(String... args){
+        if (bookDataRepository.count() > 0) {
+            return;
+        }
+
+        List<String> dummyTitles = Arrays.asList(
+                "The Great Gatsby",
+                "To Kill a Mockingbird",
+                "1984",
+                "Pride and Prejudice",
+                "The Hobbit"
         );
-        bookRepository.saveAll(bookDataList);
+
+        for (int i = 0; i < dummyTitles.size(); i++) {
+            String title = dummyTitles.get(i);
+            int totalQty = 3 + (i % 3); // Generates copies between 3 and 5
+            int availableQty = totalQty; // Initializing all as available
+
+            // 1. Create and Save BookData parent record
+            BookData bookData = new BookData(title, totalQty, availableQty);
+            bookData.setBooks(new HashSet<>());
+            bookData = bookDataRepository.save(bookData);
+
+            // 2. Generate individual Book copies for this title
+            for (int j = 1; j <= totalQty; j++) {
+                Book book = new Book();
+                // Ensure unique name/barcode constraint (e.g., "1984 - Copy 1")
+                book.setBookName(title + " - Copy " + j);
+                book.setBookData(bookData);
+                book.setLoan(null); // Explicitly setting loan to null initially
+                bookRepository.save(book);
+            }
+        }
 
 
     }

@@ -10,7 +10,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "book")
+@Table(name = "book_data")
 public class BookData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +28,6 @@ public class BookData {
 
     @OneToMany(mappedBy = "bookData", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Book> books;
-
 
     public BookData(String bookName, int totalQuantity, int availableQuantity){
         this.bookName = bookName;
