@@ -26,6 +26,9 @@ public class BookData {
     @Column(name = "available_quantity")
     private int availableQuantity;
 
+    @OneToMany(mappedBy = "bookData", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Book> books;
+
 
     public BookData(String bookName, int totalQuantity, int availableQuantity){
         this.bookName = bookName;

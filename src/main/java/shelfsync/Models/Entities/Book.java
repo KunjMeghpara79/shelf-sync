@@ -24,4 +24,8 @@ public class Book {
     @JoinColumn(name = "loan_id")
     private Loan loan = null;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_data_id", nullable = false)
+    private BookData bookData;
+
 }
