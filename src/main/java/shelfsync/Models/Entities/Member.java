@@ -2,6 +2,7 @@ package shelfsync.Models.Entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
+import shelfsync.Enums.MemberStatus;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -33,4 +34,8 @@ public class Member {
 
     @Column(name = "fine")
     private int fine = 0;
+
+    @Enumerated(EnumType.STRING)
+    private MemberStatus memberStatus = MemberStatus.ACTIVE;
+
 }

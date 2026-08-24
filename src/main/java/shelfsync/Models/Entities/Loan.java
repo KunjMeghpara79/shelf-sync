@@ -1,9 +1,8 @@
 package shelfsync.Models.Entities;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import shelfsync.Enums.LoanStatus;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,10 +18,10 @@ public class Loan {
     private int loanId;
 
     @Column(name = "start_time")
-    private LocalDateTime start = LocalDateTime.now();
+    private LocalDateTime issueDate = LocalDateTime.now();
 
     @Column(name = "end_time")
-    private LocalDateTime end;
+    private LocalDateTime dueDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
@@ -30,5 +29,12 @@ public class Loan {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
-    private Book book;
+    private BookData bookData = null;
+
+    @Enumerated(EnumType.STRING)
+    private LoanStatus loanStatus = LoanStatus.PENDING;
+
+    @OneToOne
+    @JoinColumn(name = "book_id")
+    private Book book = null;
 }
