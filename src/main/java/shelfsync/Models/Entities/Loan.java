@@ -4,6 +4,7 @@ import lombok.*;
 import shelfsync.Enums.LoanStatus;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Getter
@@ -17,19 +18,15 @@ public class Loan {
     @Column(name = "loan_id")
     private int loanId;
 
-    @Column(name = "start_time")
-    private LocalDateTime issueDate = LocalDateTime.now();
+    @Column(name = "issue_date")
+    private LocalDateTime issueDate = LocalDateTime.now(ZoneId.of("UTC"));
 
-    @Column(name = "end_time")
+    @Column(name = "due_date")
     private LocalDateTime dueDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id", nullable = false)
-    private BookData bookData = null;
 
     @Enumerated(EnumType.STRING)
     private LoanStatus loanStatus = LoanStatus.PENDING;
