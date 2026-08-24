@@ -38,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final String authHeader = request.getHeader("Authorization");
             final String jwt;
             final String username;
-        /*
+         /*
          Bearer is not part of the JWT. It is a standard prefix that tells Spring/server:
          The following value is an access token. Use it for authentication.
          */
