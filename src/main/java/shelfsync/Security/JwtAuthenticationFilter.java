@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import shelfsync.Exceptions.MemberNotFoundException;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -75,6 +76,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType("application/json");
             ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "JWT is tampered");
+            objectMapper.writeValue(response.getWriter(), errorResponse);
+            return;
+        }
+        catch (MemberNotFoundException e){
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setContentType("application/json");
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Member not found!");
             objectMapper.writeValue(response.getWriter(), errorResponse);
             return;
         }
