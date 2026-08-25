@@ -41,7 +41,7 @@ public class LoanScheduler {
 
         loanRepository.saveAll(loans);
     }
-    @Scheduled(fixedRate = 1000)
+    @Scheduled(fixedRate = 3600000)
     @Transactional
     public void addFines(){
 
@@ -50,9 +50,8 @@ public class LoanScheduler {
         List<Loan> loans = loanRepository.findByLoanStatus(LoanStatus.DUE);
 
         for(Loan loan : loans){
-            int hoursLate = (int) ChronoUnit.HOURS.between(loan.getDueDate(), now);
             Member member = loan.getMember();
-            member.setFine(member.getFine() + (hoursLate * FIXED_FINE));
+            member.setFine(member.getFine() + FIXED_FINE);
         }
     }
 }
