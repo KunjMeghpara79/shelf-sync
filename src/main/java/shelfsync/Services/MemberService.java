@@ -55,7 +55,7 @@ public class MemberService {
         Loan loan = new Loan();
         loan.setMember(member);
         loan.setBook(book);
-        loan.setDueDate(loan.getIssueDate().plusSeconds(30));
+        loan.setDueDate(loan.getIssueDate().plusDays(5));
         book.setLoan(loan);
         bookData.setAvailableQuantity(bookData.getAvailableQuantity() - 1);
         member.getLoans().add(loan);
