@@ -1,9 +1,11 @@
 package shelfsync.Services;
 
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import shelfsync.Enums.MemberStatus;
-import shelfsync.Exceptions.MemberNotFoundException;
+import shelfsync.Exceptions.*;
 import shelfsync.Mappers.LoanMapper;
 import shelfsync.Models.DTOs.LoanResponseDto;
 import shelfsync.Models.Entities.Book;
@@ -33,23 +35,28 @@ public class MemberService {
         this.bookRepository = bookRepository;
     }
 
+    @Transactional
     public LoanResponseDto borrowBook(int id){
-        BookData bookData = bookDataRepository.findById(id).orElseThrow();
+        BookData bookData = bookDataRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found!"));
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Member member = memberRepository.findByMemberEmail(email).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
-        if(bookData.getAvailableQuantity() <= 0) throw new RuntimeException();
-        if(member.getMemberStatus() == MemberStatus.RESTRICTED) throw new RuntimeException();
+        String regex = "\\s*-\\s*(?i)copy(\\s+\\d+)?";
+        if(member.getLoans().stream()
+                .anyMatch(l -> l.getBook().getBookName().replaceAll(regex,"").equals(bookData.getBookName()))){
+            throw new BookAlreadyBorrowedException("You have already borrowed one copy of this book.");
+        }
+        if(bookData.getAvailableQuantity() <= 0) throw new BookNotAvailableException("No copies Available!");
+        if(member.getMemberStatus() == MemberStatus.RESTRICTED) throw new RestrictedAccessException("You can not borrow more books!");
         Book book = bookData.getBooks().stream()
                 .filter(b -> b.getLoan() == null)
+                .sorted((a,b) -> a.getBookId() - b.getBookId())
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No copies available for checkout."));
         Loan loan = new Loan();
         loan.setMember(member);
         loan.setBook(book);
-        loan.setDueDate(loan.getIssueDate().plusDays(5));
-        loanRepository.save(loan);
+        loan.setDueDate(loan.getIssueDate().plusSeconds(30));
         book.setLoan(loan);
-        bookRepository.save(book);
         bookData.setAvailableQuantity(bookData.getAvailableQuantity() - 1);
         member.getLoans().add(loan);
         LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(loan);

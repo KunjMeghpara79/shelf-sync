@@ -18,7 +18,7 @@ public class Book {
     @Column(name = "book_id")
     private int bookId;
 
-    @Column(unique = true,nullable = false,name = "book_name")
+    @Column(nullable = false,name = "book_name")
     private String bookName;
 
     @OneToOne
