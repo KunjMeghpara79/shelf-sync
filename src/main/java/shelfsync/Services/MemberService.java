@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import shelfsync.Enums.LoanStatus;
 import shelfsync.Enums.MemberStatus;
 import shelfsync.Exceptions.*;
 import shelfsync.Mappers.LoanMapper;
@@ -17,6 +18,9 @@ import shelfsync.Repositories.BookRepository;
 import shelfsync.Repositories.LoanRepository;
 import shelfsync.Repositories.MemberRepository;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 @Service
@@ -27,6 +31,7 @@ public class MemberService {
     private final LoanRepository loanRepository;
     private final LoanMapper loanMapper;
     private final BookRepository bookRepository;
+    private final String regex = "\\s*-\\s*(?i)copy(\\s+\\d+)?";
     public MemberService(MemberRepository memberRepository, BookDataRepository bookDataRepository, LoanRepository loanRepository, LoanMapper loanMapper, BookRepository bookRepository) {
         this.memberRepository = memberRepository;
         this.bookDataRepository = bookDataRepository;
@@ -40,7 +45,6 @@ public class MemberService {
         BookData bookData = bookDataRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found!"));
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Member member = memberRepository.findByMemberEmail(email).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
-        String regex = "\\s*-\\s*(?i)copy(\\s+\\d+)?";
         if(member.getLoans().stream()
                 .anyMatch(l -> l.getBook().getBookName().replaceAll(regex,"").equals(bookData.getBookName()))){
             throw new BookAlreadyBorrowedException("You have already borrowed one copy of this book.");
@@ -59,6 +63,32 @@ public class MemberService {
         book.setLoan(loan);
         bookData.setAvailableQuantity(bookData.getAvailableQuantity() - 1);
         member.getLoans().add(loan);
+        LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(loan);
+        loanResponseDto = loanResponseDto.withBookName(loan.getBook().getBookName());
+        return loanResponseDto;
+    }
+
+    @Transactional
+    public LoanResponseDto returnBook(int id){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Member member = memberRepository.findByMemberEmail(email).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
+        if(!member.getLoans().stream()
+                .anyMatch(l -> l.getBook().getBookId() == id)){
+            throw new BookNotAvailableException("You have not borrowed this book!");
+        }
+        Book book = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found!"));
+        Loan loan = member.getLoans().stream()
+                .filter(l -> l.getBook().getBookId() == book.getBookId()).findFirst().orElseThrow(() -> new LoanNotFoundException("Loan not found!"));
+        LocalDateTime returnTime = LocalDateTime.now(ZoneId.of("UTC"));
+        if(loan.getLoanStatus() == LoanStatus.DUE){
+            int hoursLate = (int) Math.abs(ChronoUnit.HOURS.between(loan.getDueDate(), returnTime));
+            member.setFine(member.getFine() - (5 * hoursLate));
+        }
+        loan.setLoanStatus(LoanStatus.PAID);
+        loan.setReturnDate(returnTime);
+        book.setLoan(null);
+        BookData bookData = bookDataRepository.findBybookName(book.getBookName().replaceAll(regex,""));
+        bookData.setAvailableQuantity(bookData.getAvailableQuantity() + 1);
         LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(loan);
         loanResponseDto = loanResponseDto.withBookName(loan.getBook().getBookName());
         return loanResponseDto;

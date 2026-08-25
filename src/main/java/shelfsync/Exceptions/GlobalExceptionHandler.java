@@ -25,7 +25,6 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleInvalidPassword(InvalidPasswordException ex){
         return new ErrorResponse(HttpStatus.FORBIDDEN.value(), ex.getMessage());
     }
-
     @ExceptionHandler(value = BookNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleBookNotFoundException(BookNotFoundException ex){
@@ -45,5 +44,10 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleRestrictedAccessException(BookAlreadyBorrowedException ex){
         return new ErrorResponse(HttpStatus.CONFLICT.value(), ex.getMessage());
+    }
+    @ExceptionHandler(value = LoanNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleLoanNotFoundException(LoanNotFoundException ex){
+        return new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
     }
 }

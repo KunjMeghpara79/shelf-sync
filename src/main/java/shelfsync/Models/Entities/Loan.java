@@ -34,4 +34,7 @@ public class Loan {
     @OneToOne
     @JoinColumn(name = "book_id")
     private Book book = null;
+
+    @Column(name = "return_date")
+    private LocalDateTime returnDate;
 }

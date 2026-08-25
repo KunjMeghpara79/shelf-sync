@@ -24,4 +24,10 @@ public class MemberController {
         LoanResponseDto loanResponseDto = memberService.borrowBook(id);
         return new ResponseEntity<>(loanResponseDto, HttpStatus.OK);
     }
+
+    @PostMapping("/return/{id}")
+    public ResponseEntity<LoanResponseDto> returnBook(@PathVariable int id){
+        LoanResponseDto loanResponseDto = memberService.returnBook(id);
+        return new ResponseEntity<>(loanResponseDto,HttpStatus.OK);
+    }
 }

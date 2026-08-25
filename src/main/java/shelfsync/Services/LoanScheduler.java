@@ -10,7 +10,6 @@ import shelfsync.Models.Entities.Loan;
 import shelfsync.Models.Entities.Member;
 import shelfsync.Repositories.LoanRepository;
 import shelfsync.Repositories.MemberRepository;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -18,7 +17,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class LoanScheduler {
 
     private final LoanRepository loanRepository;
