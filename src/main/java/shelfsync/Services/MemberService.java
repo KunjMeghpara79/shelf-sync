@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import shelfsync.Enums.LoanStatus;
 import shelfsync.Enums.MemberStatus;
 import shelfsync.Exceptions.*;
@@ -22,7 +21,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class MemberService {
@@ -53,9 +52,7 @@ public class MemberService {
         if(bookData.getAvailableQuantity() <= 0) throw new BookNotAvailableException("No copies Available!");
         if(member.getMemberStatus() == MemberStatus.RESTRICTED) throw new RestrictedAccessException("You can not borrow more books!");
         Book book = bookData.getBooks().stream()
-                .filter(b -> b.getLoan() == null)
-                .sorted((a,b) -> a.getBookId() - b.getBookId())
-                .findFirst()
+                .filter(b -> b.getLoan() == null).min((a, b) -> a.getBookId() - b.getBookId())
                 .orElseThrow(() -> new RuntimeException("No copies available for checkout."));
         Loan loan = new Loan();
         loan.setMember(member);
