@@ -1,6 +1,7 @@
 package shelfsync.Services;
 
 import jakarta.transaction.Transactional;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -17,10 +18,10 @@ import shelfsync.Repositories.BookDataRepository;
 import shelfsync.Repositories.BookRepository;
 import shelfsync.Repositories.LoanRepository;
 import shelfsync.Repositories.MemberRepository;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -92,5 +93,29 @@ public class MemberService {
         LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(loan);
         loanResponseDto = loanResponseDto.withBookName(loan.getBook().getBookName());
         return loanResponseDto;
+    }
+
+    @Scheduled(fixedRate = 1000)
+    @Transactional
+    public void restrictMembers(){
+        List<Member> members = memberRepository.findByFineGreaterThanEqualAndMemberStatus(30,MemberStatus.ACTIVE);
+        for(Member member : members){
+            member.setMemberStatus(MemberStatus.RESTRICTED);
+        }
+    }
+
+    public List<LoanResponseDto> getLateLoansReport(){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Member member = memberRepository.findByMemberEmail(email).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
+
+        List<Loan> lateLoans = loanRepository.findByLoanStatusAndMember(LoanStatus.DUE,member);
+
+        List<LoanResponseDto> loanResponseDtos = lateLoans.stream()
+                .map(l -> {
+                    LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(l);
+                   return loanResponseDto.withBookName(l.getBook().getBookName());
+
+                }).toList();
+        return loanResponseDtos;
     }
 }
