@@ -83,13 +83,9 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleTypeMismatchExceptions(HttpMessageNotReadableException ex) {
         String details = "Invalid JSON structure or incorrect data types.";
 
-        if (ex.getMostSpecificCause() != null) {
-            details = ex.getMostSpecificCause().getMessage();
-        }
-
         return new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                "JSON Parsing Error: " + details
+                "Error: " + details
         );
     }
 
@@ -100,13 +96,12 @@ public class GlobalExceptionHandler {
         String message = String.format(
                 "Parameter '%s' should be of type '%s'.",
                 ex.getName(),
-                ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown",
-                ex.getValue()
+                ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown"
         );
 
         return new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                "URL Parameter Error: " + message
+                "Error: " + message
         );
     }
 
