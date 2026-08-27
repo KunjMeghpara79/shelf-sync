@@ -12,27 +12,19 @@ import java.util.List;
 @RequestMapping("/member")
 public class MemberController {
     private final MemberService memberService;
-
     public MemberController(MemberService memberService) {
         this.memberService = memberService;
     }
 
-
-    @PostMapping("/borrow/{id}")
-    public ResponseEntity<LoanResponseDto> borrowBook(@PathVariable int id){
-        LoanResponseDto loanResponseDto = memberService.borrowBook(id);
-        return new ResponseEntity<>(loanResponseDto, HttpStatus.OK);
-    }
-
-    @PostMapping("/return/{id}")
-    public ResponseEntity<LoanResponseDto> returnBook(@PathVariable int id){
-        LoanResponseDto loanResponseDto = memberService.returnBook(id);
-        return new ResponseEntity<>(loanResponseDto,HttpStatus.OK);
-    }
-
     @GetMapping("/late-loans")
     public ResponseEntity<List<LoanResponseDto>> getLateloans(){
-        List<LoanResponseDto> loanResponseDtos = memberService.getLateLoansReport();
+        List<LoanResponseDto> loanResponseDtos = memberService.getLoansReport();
+        return new ResponseEntity<>(loanResponseDtos,HttpStatus.OK);
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<List<LoanResponseDto>> getMemberHistory(){
+        List<LoanResponseDto> loanResponseDtos = memberService.getLoanHistory();
         return new ResponseEntity<>(loanResponseDtos,HttpStatus.OK);
     }
 }

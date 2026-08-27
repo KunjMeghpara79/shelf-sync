@@ -1,6 +1,9 @@
 package shelfsync;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import shelfsync.Models.Entities.Admin;
 import shelfsync.Models.Entities.Book;
 import shelfsync.Models.Entities.BookData;
+import shelfsync.Repositories.AdminRepository;
 import shelfsync.Repositories.BookDataRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -13,16 +16,27 @@ import java.util.List;
 @Component
 public class BooksInitializer implements CommandLineRunner {
 
-    private final BookDataRepository bookDataRepository;
+    private final AdminRepository adminRepository;
+    private final PasswordEncoder passwordEncoder;
     private final BookRepository bookRepository;
-    public BooksInitializer(BookDataRepository bookDataRepository, BookRepository bookRepository) {
-        this.bookDataRepository = bookDataRepository;
-
+    private final BookDataRepository bookDataRepository;
+    public BooksInitializer(AdminRepository adminRepository, PasswordEncoder passwordEncoder, BookRepository bookRepository, BookDataRepository bookDataRepository) {
+        this.adminRepository = adminRepository;
+        this.passwordEncoder = passwordEncoder;
         this.bookRepository = bookRepository;
+        this.bookDataRepository = bookDataRepository;
     }
 
     @Override
-    public void run(String... args){
+    public void run(String... args) throws Exception {
+        if (adminRepository.count() == 0) {
+            Admin admin = new Admin();
+            admin.setAdminEmail("admin@gmail.com");
+            admin.setAdminName("Admin");
+            admin.setPassword(passwordEncoder.encode("Admin@123"));
+            adminRepository.save(admin);
+
+        }
         if (bookDataRepository.count() > 0) {
             return;
         }
@@ -52,7 +66,6 @@ public class BooksInitializer implements CommandLineRunner {
                 bookRepository.save(book);
             }
         }
-
 
     }
 }

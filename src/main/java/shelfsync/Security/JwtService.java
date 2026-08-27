@@ -23,17 +23,28 @@ public class JwtService{
         EXPIRATION_TIME = expirationTime;
     }
 
-    public String generateToken(String username){
+    public String generateToken(String username,String role){
         return Jwts.builder()
                 .subject(username)
+                .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(getSigningKey(), Jwts.SIG.HS256)
                 .compact();
     }
+    public String getRoleFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(getSigningKey()) // Use the same key used for signing
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return claims.get("role", String.class); // Safely extracts and casts the claim
+    }
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
+
 
     // 4. Extract expiration date
     public Date extractExpiration(String token) {

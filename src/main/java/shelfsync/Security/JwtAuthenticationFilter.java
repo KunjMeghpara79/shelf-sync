@@ -1,4 +1,6 @@
 package shelfsync.Security;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import shelfsync.Exceptions.ErrorResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -17,6 +19,7 @@ import shelfsync.Exceptions.MemberNotFoundException;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -53,10 +56,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
                 if (jwtService.validateToken(jwt, userDetails)) {
+                    String role = jwtService.getRoleFromToken(jwt);
+                    List<GrantedAuthority> authorities =
+                            List.of(new SimpleGrantedAuthority("ROLE_" + role));
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
-                            userDetails.getAuthorities()
+                            authorities
                     );
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }

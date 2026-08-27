@@ -39,6 +39,6 @@ public class AuthService {
             throw new InvalidPasswordException("Invalid password!");
         }
         // 3. Generate token if credentials match
-        return jwtService.generateToken(loginRequestDto.email());
+        return jwtService.generateToken(loginRequestDto.email(),"MEMBER");
     }
 }

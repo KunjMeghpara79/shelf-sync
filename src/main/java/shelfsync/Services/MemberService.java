@@ -41,22 +41,20 @@ public class MemberService {
     }
 
     @Transactional
-    public LoanResponseDto borrowBook(int id){
-        BookData bookData = bookDataRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found!"));
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Member member = memberRepository.findByMemberEmail(email).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
+    public LoanResponseDto borrowBook(int bookId,int memberId){
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException("Book not found!"));
+        BookData bookData = book.getBookData();
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
         if(member.getLoans().stream()
                 .anyMatch(l -> l.getBook().getBookName().replaceAll(regex,"").equals(bookData.getBookName()))){
-            throw new BookAlreadyBorrowedException("You have already borrowed one copy of this book.");
+            throw new BookAlreadyBorrowedException("This member has already borrowed one copy of this book");
         }
         if(bookData.getAvailableQuantity() <= 0) throw new BookNotAvailableException("No copies Available!");
-        if(member.getMemberStatus() == MemberStatus.RESTRICTED) throw new RestrictedAccessException("You can not borrow more books!");
-        Book book = bookData.getBooks().stream()
-                .filter(b -> b.getLoan() == null).min((a, b) -> a.getBookId() - b.getBookId())
-                .orElseThrow(() -> new RuntimeException("No copies available for checkout."));
+        if(member.getMemberStatus() == MemberStatus.RESTRICTED) throw new RestrictedAccessException("Member is Restricted!");
         Loan loan = new Loan();
         loan.setMember(member);
         loan.setBook(book);
+        loan.setBookData(bookData);
         loan.setDueDate(loan.getIssueDate().plusDays(5));
         book.setLoan(loan);
         bookData.setAvailableQuantity(bookData.getAvailableQuantity() - 1);
@@ -68,20 +66,16 @@ public class MemberService {
 
     @Transactional
     public LoanResponseDto returnBook(int id){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Member member = memberRepository.findByMemberEmail(email).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
+        Book book = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found!"));
+        Member member = book.getLoan().getMember();
         if(!member.getLoans().stream()
                 .anyMatch(l -> l.getBook().getBookId() == id)){
             throw new BookNotAvailableException("You have not borrowed this book!");
         }
-        Book book = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found!"));
+
         Loan loan = member.getLoans().stream()
                 .filter(l -> l.getBook().getBookId() == book.getBookId()).findFirst().orElseThrow(() -> new LoanNotFoundException("Loan not found!"));
         LocalDateTime returnTime = LocalDateTime.now(ZoneId.of("UTC"));
-        if(loan.getLoanStatus() == LoanStatus.DUE){
-            int hoursLate = (int) Math.abs(ChronoUnit.HOURS.between(loan.getDueDate(), returnTime));
-            member.setFine(member.getFine() - (5 * hoursLate));
-        }
         loan.setLoanStatus(LoanStatus.PAID);
         loan.setReturnDate(returnTime);
         book.setLoan(null);
@@ -101,16 +95,30 @@ public class MemberService {
         }
     }
 
-    public List<LoanResponseDto> getLateLoansReport(){
+    public List<LoanResponseDto> getLoansReport(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Member member = memberRepository.findByMemberEmail(email).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
 
-        List<Loan> lateLoans = loanRepository.findByLoanStatusAndMember(LoanStatus.DUE,member);
+        List<Loan> loans = loanRepository.findByLoanStatusAndMember(LoanStatus.DUE,member);
+        loans.addAll(loanRepository.findByLoanStatusAndMember(LoanStatus.PENDING,member));
 
-        List<LoanResponseDto> loanResponseDtos = lateLoans.stream()
+        List<LoanResponseDto> loanResponseDtos = loans.stream()
                 .map(l -> {
                     LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(l);
                    return loanResponseDto.withBookName(l.getBook().getBookName());
+
+                }).toList();
+        return loanResponseDtos;
+    }
+
+    public List<LoanResponseDto> getLoanHistory(){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Member member = memberRepository.findByMemberEmail(email).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
+        List<Loan> loans = loanRepository.findByLoanStatusAndMember(LoanStatus.PAID,member);
+        List<LoanResponseDto> loanResponseDtos = loans.stream()
+                .map(l -> {
+                    LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(l);
+                    return loanResponseDto.withBookName(l.getBook().getBookName());
 
                 }).toList();
         return loanResponseDtos;

@@ -23,11 +23,17 @@ public class BookData {
     @Column(name = "total_quantity")
     private int totalQuantity;
 
+    @Column(name = "author")
+    private String authorName;
+
     @Column(name = "available_quantity")
     private int availableQuantity;
 
     @OneToMany(mappedBy = "bookData", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Book> books;
+
+    @OneToMany(mappedBy = "bookData", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Loan> loans;
 
     public BookData(String bookName, int totalQuantity, int availableQuantity){
         this.bookName = bookName;

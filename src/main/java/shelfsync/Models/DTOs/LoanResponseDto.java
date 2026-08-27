@@ -12,6 +12,7 @@ public record LoanResponseDto(LocalDateTime issueDate, LocalDateTime dueDate, St
                 newBookName,
                 this.loanStatus,
                 this.returnDate
+
         );
     }
 }

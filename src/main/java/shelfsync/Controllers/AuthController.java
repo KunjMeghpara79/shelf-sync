@@ -1,4 +1,5 @@
 package shelfsync.Controllers;
+import jakarta.validation.Valid;
 import shelfsync.Models.DTOs.LoginRequestDto;
 import shelfsync.Models.DTOs.MemberRequestDto;
 import shelfsync.Models.DTOs.MemberResponseDto;
@@ -20,15 +21,14 @@ public class AuthController {
         this.authService = authService;
     }
 
-
     @PostMapping("/register")
-    public ResponseEntity<MemberResponseDto> registerMember(@RequestBody MemberRequestDto memberRequestDto){
+    public ResponseEntity<MemberResponseDto> registerMember(@RequestBody @Valid MemberRequestDto memberRequestDto){
         MemberResponseDto memberResponseDto = authService.registerMember(memberRequestDto);
         return new ResponseEntity<>(memberResponseDto, HttpStatus.OK);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginMember(@RequestBody LoginRequestDto loginRequestDto) throws Exception {
+    public ResponseEntity<String> loginMember(@RequestBody @Valid LoginRequestDto loginRequestDto) throws Exception {
         String jwt = authService.loginValidation(loginRequestDto);
         return new ResponseEntity<>(jwt,HttpStatus.OK);
     }
