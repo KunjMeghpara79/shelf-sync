@@ -1,13 +1,13 @@
 package shelfsync;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import shelfsync.Models.Entities.Admin;
-import shelfsync.Models.Entities.Book;
-import shelfsync.Models.Entities.BookData;
-import shelfsync.Repositories.AdminRepository;
-import shelfsync.Repositories.BookDataRepository;
+import shelfsync.models.entities.Admin;
+import shelfsync.models.entities.Book;
+import shelfsync.models.entities.BookData;
+import shelfsync.repositories.AdminRepository;
+import shelfsync.repositories.BookDataRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import shelfsync.Repositories.BookRepository;
+import shelfsync.repositories.BookRepository;
 
 import java.util.Arrays;
 import java.util.HashSet;
