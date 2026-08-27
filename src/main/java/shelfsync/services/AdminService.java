@@ -94,7 +94,7 @@ public class AdminService {
         bookDataRepository.save(bookData);
         for (int j = 1; j <= bookData.getTotalQuantity(); j++) {
             Book book = new Book();
-            book.setBookName(bookData.getBookName() + " - Copy " + j);
+            book.setBookName(bookData.getBookName());
             book.setBookData(bookData);
             book.setLoan(null);
             bookRepository.save(book);

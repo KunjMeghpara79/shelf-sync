@@ -60,7 +60,7 @@ public class BooksInitializer implements CommandLineRunner {
 
             for (int j = 1; j <= totalQty; j++) {
                 Book book = new Book();
-                book.setBookName(title + " - Copy " + j);
+                book.setBookName(title);
                 book.setBookData(bookData);
                 book.setLoan(null);
                 bookRepository.save(book);
