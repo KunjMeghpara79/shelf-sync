@@ -67,8 +67,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
-
-            // 6. Pass the request to the next filter in the chain
             filterChain.doFilter(request, response);
         }
         catch (ExpiredJwtException e){
@@ -85,15 +83,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             objectMapper.writeValue(response.getWriter(), errorResponse);
             return;
         }
-        catch (MemberNotFoundException e){
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.setContentType("application/json");
-            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Member not found!");
-            objectMapper.writeValue(response.getWriter(), errorResponse);
-            return;
-        }
-
-
-
     }
 }

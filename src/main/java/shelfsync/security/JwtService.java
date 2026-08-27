@@ -34,19 +34,18 @@ public class JwtService{
     }
     public String getRoleFromToken(String token) {
         Claims claims = Jwts.parser()
-                .verifyWith(getSigningKey()) // Use the same key used for signing
+                .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
 
-        return claims.get("role", String.class); // Safely extracts and casts the claim
+        return claims.get("role", String.class);
     }
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
 
-    // 4. Extract expiration date
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
@@ -64,12 +63,10 @@ public class JwtService{
                 .getPayload();
     }
 
-    // 5. Check if the token has expired
     public Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
-    // 6. Validate token against the UserDetails service
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
