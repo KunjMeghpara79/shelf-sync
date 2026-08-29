@@ -1,6 +1,7 @@
 package shelfsync.services;
 
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,8 @@ public class MemberServiceImpl implements MemberService{
     private final LoanRepository loanRepository;
     private final LoanMapper loanMapper;
     private final BookRepository bookRepository;
+    @Value("${member.fine.threshold}")
+    private int fineThreshold;
     private final String regex = "\\s*-\\s*(?i)copy(\\s+\\d+)?";
     public MemberServiceImpl(MemberRepository memberRepository, BookDataRepository bookDataRepository, LoanRepository loanRepository, LoanMapper loanMapper, BookRepository bookRepository) {
         this.memberRepository = memberRepository;
@@ -48,12 +51,12 @@ public class MemberServiceImpl implements MemberService{
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException("Book not found!"));
         BookData bookData = book.getBookData();
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
+        if(member.getMemberStatus() == MemberStatus.RESTRICTED) throw new RestrictedAccessException("Member is Restricted!");
         if(member.getLoans().stream()
                 .anyMatch(l -> l.getBook().getBookName().replaceAll(regex,"").equals(bookData.getBookName()))){
             throw new BookAlreadyBorrowedException("This member has already borrowed one copy of this book");
         }
         if(bookData.getAvailableQuantity() <= 0) throw new BookNotAvailableException("No copies Available!");
-        if(member.getMemberStatus() == MemberStatus.RESTRICTED) throw new RestrictedAccessException("Member is Restricted!");
         Loan loan = new Loan();
         loan.setMember(member);
         loan.setBook(book);
@@ -93,7 +96,7 @@ public class MemberServiceImpl implements MemberService{
     @Scheduled(fixedRate = 1000)
     @Transactional
     public void restrictMembers(){
-        List<Member> members = memberRepository.findByFineGreaterThanEqualAndMemberStatus(30,MemberStatus.ACTIVE);
+        List<Member> members = memberRepository.findByFineGreaterThanEqualAndMemberStatus(fineThreshold,MemberStatus.ACTIVE);
         for(Member member : members){
             member.setMemberStatus(MemberStatus.RESTRICTED);
         }

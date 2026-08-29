@@ -2,6 +2,7 @@ package shelfsync.services;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import shelfsync.enums.LoanStatus;
@@ -19,7 +20,10 @@ public class LoanScheduler {
 
     private final LoanRepository loanRepository;
     private final MemberRepository memberRepository;
-    private final int FIXED_FINE = 5;
+
+    @Value("${loan.fine.fixedrate}")
+    private int FIXED_FINE;
+
     @Scheduled(fixedRate = 1000)
     public void checkOverdueLoans() {
 
@@ -37,6 +41,7 @@ public class LoanScheduler {
 
         loanRepository.saveAll(loans);
     }
+
     @Scheduled(fixedRate = 3600000)
     @Transactional
     public void addFines(){
