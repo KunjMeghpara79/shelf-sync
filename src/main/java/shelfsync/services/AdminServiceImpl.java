@@ -13,11 +13,12 @@ import shelfsync.models.dto.*;
 import shelfsync.models.entities.*;
 import shelfsync.repositories.*;
 import shelfsync.security.JwtService;
+import shelfsync.services.interfaces.AdminService;
 
 import java.util.List;
 
 @Service
-public class AdminService {
+public class AdminServiceImpl implements AdminService {
 
 
     private final AdminRepository adminRepository;
@@ -30,7 +31,7 @@ public class AdminService {
     private final BookDataRepository bookDataRepository;
     private final BookDataMapper bookDataMapper;
     private final BookRepository bookRepository;
-    public AdminService(AdminRepository adminRepository, PasswordEncoder passwordEncoder, JwtService jwtService, LoanRepository loanRepository, LoanMapper loanMapper, MemberMapper memberMapper, MemberRepository memberRepository, BookDataRepository bookDataRepository, BookDataMapper bookDataMapper, BookRepository bookRepository) {
+    public AdminServiceImpl(AdminRepository adminRepository, PasswordEncoder passwordEncoder, JwtService jwtService, LoanRepository loanRepository, LoanMapper loanMapper, MemberMapper memberMapper, MemberRepository memberRepository, BookDataRepository bookDataRepository, BookDataMapper bookDataMapper, BookRepository bookRepository) {
         this.adminRepository = adminRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
@@ -43,15 +44,18 @@ public class AdminService {
         this.bookRepository = bookRepository;
     }
 
-    public String loginValidation(AdminLoginRequestDto adminLoginRequestDto){
+    @Override
+    public JwtResponseDto loginValidation(AdminLoginRequestDto adminLoginRequestDto){
         Admin admin = adminRepository.findByAdminEmail(adminLoginRequestDto.adminEmail()).orElseThrow(() -> new MemberNotFoundException("Admin not found!"));
         if (!passwordEncoder.matches(adminLoginRequestDto.password(),admin.getPassword())) {
             throw new InvalidPasswordException("Invalid password!");
         }
         // 3. Generate token if credentials match
-        return jwtService.generateToken(admin.getAdminEmail(),"ADMIN");
+        String token = jwtService.generateToken(admin.getAdminEmail(),"ADMIN");
+        return new JwtResponseDto(token);
     }
 
+    @Override
     public List<LoanResponseDto> getLoansReport(){
         List<Loan> loans = loanRepository.findByLoanStatus(LoanStatus.DUE);
         loans.addAll(loanRepository.findByLoanStatus(LoanStatus.PENDING));
@@ -63,6 +67,8 @@ public class AdminService {
                 }).toList();
         return loanResponseDtos;
     }
+
+    @Override
     public List<LoanResponseDto> getMemberLoans(int memberId){
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
         List<LoanResponseDto> loanResponseDtos = member.getLoans().stream()
@@ -73,11 +79,13 @@ public class AdminService {
         return loanResponseDtos;
     }
 
+    @Override
     public MemberResponseDto getMember(int memberId){
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
         return memberMapper.memberToMemberResponseDto(member);
     }
 
+    @Override
     public MemberResponseDto payFine(int memberId,int fineAmount){
         if(fineAmount <=0 )throw new FinePayException("Amount can not be zero or negative");
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
@@ -87,6 +95,7 @@ public class AdminService {
         return memberMapper.memberToMemberResponseDto(member);
     }
 
+    @Override
     public BookDataResponseDto addBook(BookDataRequestDto bookDataRequestDto){
 
         BookData bookData = bookDataMapper.bookDataRequestDtoToBookData(bookDataRequestDto);

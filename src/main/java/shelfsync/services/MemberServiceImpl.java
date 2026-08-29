@@ -17,13 +17,16 @@ import shelfsync.repositories.BookDataRepository;
 import shelfsync.repositories.BookRepository;
 import shelfsync.repositories.LoanRepository;
 import shelfsync.repositories.MemberRepository;
+import shelfsync.services.interfaces.MemberService;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
-public class MemberService {
+public class MemberServiceImpl implements MemberService{
 
     private final MemberRepository memberRepository;
     private final BookDataRepository bookDataRepository;
@@ -31,7 +34,7 @@ public class MemberService {
     private final LoanMapper loanMapper;
     private final BookRepository bookRepository;
     private final String regex = "\\s*-\\s*(?i)copy(\\s+\\d+)?";
-    public MemberService(MemberRepository memberRepository, BookDataRepository bookDataRepository, LoanRepository loanRepository, LoanMapper loanMapper, BookRepository bookRepository) {
+    public MemberServiceImpl(MemberRepository memberRepository, BookDataRepository bookDataRepository, LoanRepository loanRepository, LoanMapper loanMapper, BookRepository bookRepository) {
         this.memberRepository = memberRepository;
         this.bookDataRepository = bookDataRepository;
         this.loanRepository = loanRepository;
@@ -39,6 +42,7 @@ public class MemberService {
         this.bookRepository = bookRepository;
     }
 
+    @Override
     @Transactional
     public LoanResponseDto borrowBook(int bookId,int memberId){
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException("Book not found!"));
@@ -63,6 +67,7 @@ public class MemberService {
         return loanResponseDto;
     }
 
+    @Override
     @Transactional
     public LoanResponseDto returnBook(int id){
         Book book = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found!"));
@@ -94,6 +99,7 @@ public class MemberService {
         }
     }
 
+    @Override
     public List<LoanResponseDto> getLoansReport(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Member member = memberRepository.findByMemberEmail(email).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
@@ -110,6 +116,7 @@ public class MemberService {
         return loanResponseDtos;
     }
 
+    @Override
     public List<LoanResponseDto> getLoanHistory(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Member member = memberRepository.findByMemberEmail(email).orElseThrow(() -> new MemberNotFoundException("Member not found!"));

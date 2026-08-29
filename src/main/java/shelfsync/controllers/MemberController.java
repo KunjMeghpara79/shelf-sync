@@ -4,7 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shelfsync.models.dto.LoanResponseDto;
-import shelfsync.services.MemberService;
+import shelfsync.services.MemberServiceImpl;
+import shelfsync.services.interfaces.MemberService;
 
 import java.util.List;
 

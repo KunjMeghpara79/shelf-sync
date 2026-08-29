@@ -5,8 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shelfsync.models.dto.*;
-import shelfsync.services.AdminService;
-import shelfsync.services.MemberService;
+import shelfsync.services.MemberServiceImpl;
+import shelfsync.services.interfaces.AdminService;
+import shelfsync.services.interfaces.MemberService;
 
 import java.util.List;
 
@@ -17,15 +18,16 @@ public class AdminController {
     private final AdminService adminService;
     private final MemberService memberService;
 
-    public AdminController(AdminService adminService, MemberService memberService) {
+    public AdminController(AdminService adminService, MemberServiceImpl memberServiceImpl, MemberService memberService) {
+
         this.adminService = adminService;
+
         this.memberService = memberService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> adminLogin(@RequestBody @Valid AdminLoginRequestDto adminLoginRequestDto) {
-        String token = adminService.loginValidation(adminLoginRequestDto);
-        return new ResponseEntity<>(token, HttpStatus.OK);
+    public ResponseEntity<JwtResponseDto> adminLogin(@RequestBody @Valid AdminLoginRequestDto adminLoginRequestDto) {
+        return new ResponseEntity<>(adminService.loginValidation(adminLoginRequestDto),HttpStatus.OK);
     }
 
     @GetMapping("/reports")
