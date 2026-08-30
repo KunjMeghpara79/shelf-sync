@@ -1,4 +1,5 @@
 package shelfsync;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import shelfsync.models.entities.Admin;
 import shelfsync.models.entities.Book;
@@ -20,6 +21,13 @@ public class BooksInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
     private final BookRepository bookRepository;
     private final BookDataRepository bookDataRepository;
+
+    @Value("${admin.email}")
+    private String adminEmail;
+
+    @Value("${admin.password}")
+    private String adminPassword;
+
     public BooksInitializer(AdminRepository adminRepository, PasswordEncoder passwordEncoder, BookRepository bookRepository, BookDataRepository bookDataRepository) {
         this.adminRepository = adminRepository;
         this.passwordEncoder = passwordEncoder;
@@ -31,9 +39,9 @@ public class BooksInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         if (adminRepository.count() == 0) {
             Admin admin = new Admin();
-            admin.setAdminEmail("admin@gmail.com");
+            admin.setAdminEmail(adminEmail);
             admin.setAdminName("Admin");
-            admin.setPassword(passwordEncoder.encode("Admin@123"));
+            admin.setPassword(passwordEncoder.encode(adminPassword));
             adminRepository.save(admin);
 
         }

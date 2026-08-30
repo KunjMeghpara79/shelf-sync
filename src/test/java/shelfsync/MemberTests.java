@@ -28,7 +28,7 @@ public class MemberTests {
 
     @Test
     @WithMockUser(username = "kunj@gmail.com", roles = "MEMBER")
-    void getLoansTest() {
+    void getLoansHistoryTest() {
 
         Member member = new Member();
 
@@ -38,6 +38,21 @@ public class MemberTests {
         memberRepository.save(member);
 
         List<LoanResponseDto> loans = memberService.getLoanHistory();
+
+        System.out.println(loans);
+    }
+    @Test
+    @WithMockUser(username = "kunj@gmail.com", roles = "MEMBER")
+    void getLoansReportTest() {
+
+//        Member member = new Member();
+//
+//        member.setMemberName("Kunj");
+//        member.setMemberEmail("kunj@gmail.com");
+//
+//        memberRepository.save(member);
+
+        List<LoanResponseDto> loans = memberService.getLoansReport();
 
         System.out.println(loans);
     }
