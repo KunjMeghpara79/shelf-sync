@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import shelfsync.enums.LoanStatus;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
