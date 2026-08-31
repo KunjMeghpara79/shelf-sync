@@ -21,7 +21,6 @@ public class WebSecurityConfigurationAdapter {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    // Use standard interface type to eliminate compilation issues
 
     private final UserDetailsService customUserDetailsService;
 
@@ -35,7 +34,6 @@ public class WebSecurityConfigurationAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    // FIXED: Build the AuthenticationManager manually to stop the infinite recursion loop
     @Bean
     public AuthenticationProvider authenticationProvider() {
         // FIXED: Pass your custom service directly into the constructor instead of using a setter method

@@ -71,17 +71,15 @@ public class BooksInitializer implements CommandLineRunner {
 
         for (int i = 0; i < dummyTitles.size(); i++) {
             String title = dummyTitles.get(i);
-            String author = dummyAuthors.get(i); // Fetch matching author by index
+            String author = dummyAuthors.get(i);
 
             int totalQty = 3 + (i % 3);
 
-            // 2. Initialize BookData with the author name
             BookData bookData = new BookData(title, totalQty, totalQty);
             bookData.setAuthorName(author);
             bookData.setBooks(new HashSet<>());
             bookDataListToSave.add(bookData);
 
-            // 3. Generate child Book items with the author name
             for (int j = 1; j <= totalQty; j++) {
                 Book book = new Book();
                 book.setBookName(title);
