@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import shelfsync.enums.LoanStatus;
 import shelfsync.enums.MemberStatus;
 import shelfsync.exceptions.*;
+import shelfsync.mappers.BookDataMapper;
 import shelfsync.mappers.LoanMapper;
+import shelfsync.models.dto.BookDataResponseDto;
 import shelfsync.models.dto.LoanResponseDto;
 import shelfsync.models.entities.Book;
 import shelfsync.models.entities.BookData;
@@ -23,7 +25,6 @@ import shelfsync.services.interfaces.MemberService;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
@@ -33,15 +34,17 @@ public class MemberServiceImpl implements MemberService{
     private final BookDataRepository bookDataRepository;
     private final LoanRepository loanRepository;
     private final LoanMapper loanMapper;
+    private final BookDataMapper bookDataMapper;
     private final BookRepository bookRepository;
     @Value("${member.fine.threshold}")
     private int fineThreshold;
     private final String regex = "\\s*-\\s*(?i)copy(\\s+\\d+)?";
-    public MemberServiceImpl(MemberRepository memberRepository, BookDataRepository bookDataRepository, LoanRepository loanRepository, LoanMapper loanMapper, BookRepository bookRepository) {
+    public MemberServiceImpl(MemberRepository memberRepository, BookDataRepository bookDataRepository, LoanRepository loanRepository, LoanMapper loanMapper, BookDataMapper bookDataMapper, BookRepository bookRepository) {
         this.memberRepository = memberRepository;
         this.bookDataRepository = bookDataRepository;
         this.loanRepository = loanRepository;
         this.loanMapper = loanMapper;
+        this.bookDataMapper = bookDataMapper;
         this.bookRepository = bookRepository;
     }
 
@@ -86,7 +89,7 @@ public class MemberServiceImpl implements MemberService{
         loan.setLoanStatus(LoanStatus.PAID);
         loan.setReturnDate(returnTime);
         book.setLoan(null);
-        BookData bookData = bookDataRepository.findBybookName(book.getBookName().replaceAll(regex,""));
+        BookData bookData = bookDataRepository.findBybookName(book.getBookName().replaceAll(regex,"")).orElseThrow(() -> new BookNotFoundException("Book not found!"));
         bookData.setAvailableQuantity(bookData.getAvailableQuantity() + 1);
         LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(loan);
         loanResponseDto = loanResponseDto.withBookName(loan.getBook().getBookName());
@@ -132,4 +135,29 @@ public class MemberServiceImpl implements MemberService{
                 }).toList();
         return loanResponseDtos;
     }
+
+    @Override
+    public List<BookDataResponseDto> getAvailableBooks(){
+        List<BookData> bookData = bookDataRepository.findAll();
+        bookData = bookData.stream()
+                .filter(b -> b.getAvailableQuantity() > 0).toList();
+        List<BookDataResponseDto> bookDataResponseDtos= bookData.stream()
+                .map(b -> bookDataMapper.bookDatatoBookDataResponseDto(b)).toList();
+        return bookDataResponseDtos;
+    }
+
+    @Override
+    public BookDataResponseDto findByBookName(String bookName) {
+        BookData bookData = bookDataRepository.findBybookName(bookName).orElseThrow(() -> new BookNotFoundException("Book not found!"));
+        return bookDataMapper.bookDatatoBookDataResponseDto(bookData);
+    }
+
+    @Override
+    public List<BookDataResponseDto> findByAuthorName(String authorName) {
+        List<BookData> bookData = bookDataRepository.findByauthorName(authorName).orElseThrow(() -> new BookNotFoundException("No books available of the author " + authorName));
+        return bookData.stream()
+                .map(b -> bookDataMapper.bookDatatoBookDataResponseDto(b)).toList();
+    }
+
+
 }
