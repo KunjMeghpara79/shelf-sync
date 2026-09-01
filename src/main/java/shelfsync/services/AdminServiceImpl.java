@@ -50,7 +50,6 @@ public class AdminServiceImpl implements AdminService {
         if (!passwordEncoder.matches(adminLoginRequestDto.password(),admin.getPassword())) {
             throw new InvalidPasswordException("Invalid password!");
         }
-        // 3. Generate token if credentials match
         String token = jwtService.generateToken(admin.getAdminEmail(),"ADMIN");
         return new JwtResponseDto(token);
     }
@@ -97,7 +96,6 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public BookDataResponseDto addBook(BookDataRequestDto bookDataRequestDto){
-
         BookData bookData = bookDataMapper.bookDataRequestDtoToBookData(bookDataRequestDto);
         bookData.setAvailableQuantity(bookData.getTotalQuantity());
         bookDataRepository.save(bookData);
