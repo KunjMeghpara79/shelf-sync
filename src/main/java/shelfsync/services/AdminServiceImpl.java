@@ -1,5 +1,6 @@
 package shelfsync.services;
 
+import jakarta.validation.Valid;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import shelfsync.enums.LoanStatus;
@@ -95,7 +96,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public BookDataResponseDto addBook(BookDataRequestDto bookDataRequestDto){
+    public BookDataResponseDto addBook( BookDataRequestDto bookDataRequestDto){
         BookData bookData = bookDataMapper.bookDataRequestDtoToBookData(bookDataRequestDto);
         bookData.setAvailableQuantity(bookData.getTotalQuantity());
         bookDataRepository.save(bookData);
