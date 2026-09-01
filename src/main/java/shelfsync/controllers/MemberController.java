@@ -48,6 +48,5 @@ public class MemberController {
     public ResponseEntity<List<BookDataResponseDto>> findByAuthorname(@PathVariable String authorName){
         List<BookDataResponseDto> bookDataResponseDtos = memberService.findByAuthorName(authorName);
         return new ResponseEntity<>(bookDataResponseDtos,HttpStatus.OK);
-
     }
 }

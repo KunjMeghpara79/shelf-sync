@@ -45,8 +45,6 @@ public class GlobalExceptionHandler {
         };
     }
 
-
-
     @ExceptionHandler({
             MemberAlreadyExistsException.class,
             BookAlreadyBorrowedException.class
@@ -68,8 +66,6 @@ public class GlobalExceptionHandler {
                     );
         };
     }
-
-
 
     @ExceptionHandler({
             InvalidPasswordException.class,
@@ -93,8 +89,6 @@ public class GlobalExceptionHandler {
         };
     }
 
-
-
     @ExceptionHandler(RestrictedAccessException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponse handleUnauthorizedException(
@@ -109,8 +103,6 @@ public class GlobalExceptionHandler {
 
         };
     }
-
-
 
     @ExceptionHandler({
             MethodArgumentNotValidException.class,

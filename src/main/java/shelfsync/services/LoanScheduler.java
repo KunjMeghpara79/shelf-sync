@@ -26,30 +26,23 @@ public class LoanScheduler {
 
     @Scheduled(fixedRate = 1000)
     public void checkOverdueLoans() {
-
         LocalDateTime now = LocalDateTime.now(ZoneId.of("UTC"));
-
         List<Loan> loans =
                 loanRepository.findByDueDateBeforeAndLoanStatus(
                         now,
                         LoanStatus.PENDING
                 );
-
         for (Loan loan : loans) {
             loan.setLoanStatus(LoanStatus.DUE);
         }
-
         loanRepository.saveAll(loans);
     }
 
     @Scheduled(fixedRate = 3600000)
     @Transactional
     public void addFines(){
-
         LocalDateTime now = LocalDateTime.now(ZoneId.of("UTC"));
-
         List<Loan> loans = loanRepository.findByLoanStatus(LoanStatus.DUE);
-
         for(Loan loan : loans){
             Member member = loan.getMember();
             member.setFine(member.getFine() + FIXED_FINE);

@@ -19,9 +19,7 @@ public class AdminController {
     private final MemberService memberService;
 
     public AdminController(AdminService adminService, MemberServiceImpl memberServiceImpl, MemberService memberService) {
-
         this.adminService = adminService;
-
         this.memberService = memberService;
     }
 
