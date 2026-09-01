@@ -82,7 +82,6 @@ public class MemberServiceImpl implements MemberService{
                 .anyMatch(l -> l.getBook().getBookId() == id)){
             throw new BookNotAvailableException("You have not borrowed this book!");
         }
-
         Loan loan = member.getLoans().stream()
                 .filter(l -> l.getBook().getBookId() == book.getBookId()).findFirst().orElseThrow(() -> new LoanNotFoundException("Loan not found!"));
         LocalDateTime returnTime = LocalDateTime.now(ZoneId.of("UTC"));
