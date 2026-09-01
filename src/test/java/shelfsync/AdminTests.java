@@ -1,5 +1,4 @@
 package shelfsync;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,7 +8,6 @@ import shelfsync.models.dto.LoanResponseDto;
 import shelfsync.models.entities.Member;
 import shelfsync.repositories.MemberRepository;
 import shelfsync.services.interfaces.AdminService;
-
 import java.util.List;
 
 @SpringBootTest
@@ -20,8 +18,6 @@ public class AdminTests {
 
     @Autowired
     private MemberRepository memberRepository;
-
-
 
     @Test
     @WithMockUser(username = "admin@gmail.com", roles = "ADMIN")
@@ -34,11 +30,9 @@ public class AdminTests {
     @WithMockUser(username = "admin@gmail.com", roles = "ADMIN")
     public void collectFineTest(){
         Member member = new Member();
-
         member.setMemberName("Kunj");
         member.setFine(10);
         member.setMemberEmail("kunj@gmail.com");
-
         memberRepository.save(member);
         adminService.payFine(1,10);
     }
