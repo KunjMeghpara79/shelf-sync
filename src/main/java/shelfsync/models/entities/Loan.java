@@ -27,7 +27,7 @@ public class Loan {
     @Column(name = "due_date")
     private LocalDateTime dueDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
@@ -36,13 +36,13 @@ public class Loan {
 
     @OneToOne
     @JoinColumn(name = "book_id")
-    private Book book = null;
+    private Book book;
 
     @Column(name = "return_date")
     private LocalDateTime returnDate;
 
 
     @JoinColumn(name = "book_data_id")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private BookData bookData;
 }

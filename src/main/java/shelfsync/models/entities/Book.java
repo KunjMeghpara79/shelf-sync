@@ -23,9 +23,9 @@ public class Book {
 
     @OneToOne
     @JoinColumn(name = "loan_id")
-    private Loan loan = null;
+    private Loan loan;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "book_data_id", nullable = false)
     private BookData bookData;
 

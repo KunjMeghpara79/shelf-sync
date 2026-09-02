@@ -16,11 +16,9 @@ import java.util.List;
 public class AdminController {
 
     private final AdminService adminService;
-    private final MemberService memberService;
 
-    public AdminController(AdminService adminService, MemberServiceImpl memberServiceImpl, MemberService memberService) {
+    public AdminController(AdminService adminService, MemberServiceImpl memberServiceImpl) {
         this.adminService = adminService;
-        this.memberService = memberService;
     }
 
     @PostMapping("/login")
