@@ -42,13 +42,13 @@ public class AdminController {
 
     @PostMapping("/issue-book/{bookId}/{memberId}")
     public ResponseEntity<LoanResponseDto> borrowBook(@PathVariable int bookId, @PathVariable int memberId) {
-        LoanResponseDto loanResponseDto = memberService.borrowBook(bookId, memberId);
+        LoanResponseDto loanResponseDto = adminService.issueBook(bookId, memberId);
         return new ResponseEntity<>(loanResponseDto, HttpStatus.OK);
     }
 
     @PostMapping("/accept-book/{bookId}")
     public ResponseEntity<LoanResponseDto> returnBook(@PathVariable int bookId) {
-        LoanResponseDto loanResponseDto = memberService.returnBook(bookId);
+        LoanResponseDto loanResponseDto = adminService.collectBook(bookId);
         return new ResponseEntity<>(loanResponseDto, HttpStatus.OK);
     }
 

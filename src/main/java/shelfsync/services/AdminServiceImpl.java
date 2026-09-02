@@ -1,12 +1,13 @@
 package shelfsync.services;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import shelfsync.enums.LoanStatus;
-import shelfsync.exceptions.FinePayException;
-import shelfsync.exceptions.InvalidPasswordException;
-import shelfsync.exceptions.MemberNotFoundException;
+import shelfsync.enums.MemberStatus;
+import shelfsync.exceptions.*;
 import shelfsync.mappers.BookDataMapper;
 import shelfsync.mappers.LoanMapper;
 import shelfsync.mappers.MemberMapper;
@@ -16,6 +17,8 @@ import shelfsync.repositories.*;
 import shelfsync.security.JwtService;
 import shelfsync.services.interfaces.AdminService;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -32,6 +35,8 @@ public class AdminServiceImpl implements AdminService {
     private final BookDataRepository bookDataRepository;
     private final BookDataMapper bookDataMapper;
     private final BookRepository bookRepository;
+
+    private final String regex = "\\s*-\\s*(?i)copy(\\s+\\d+)?";
     public AdminServiceImpl(AdminRepository adminRepository, PasswordEncoder passwordEncoder, JwtService jwtService, LoanRepository loanRepository, LoanMapper loanMapper, MemberMapper memberMapper, MemberRepository memberRepository, BookDataRepository bookDataRepository, BookDataMapper bookDataMapper, BookRepository bookRepository) {
         this.adminRepository = adminRepository;
         this.passwordEncoder = passwordEncoder;
@@ -45,6 +50,54 @@ public class AdminServiceImpl implements AdminService {
         this.bookRepository = bookRepository;
     }
 
+
+
+    @Override
+    @Transactional
+    public LoanResponseDto issueBook(int bookId, int memberId){
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException("Book not found!"));
+        BookData bookData = book.getBookData();
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
+        if(member.getMemberStatus() == MemberStatus.RESTRICTED) throw new RestrictedAccessException("Member is Restricted!");
+        if(member.getLoans().stream()
+                .anyMatch(l -> l.getBook().getBookName().replaceAll(regex,"").equals(bookData.getBookName()))){
+            throw new BookAlreadyBorrowedException("This member has already borrowed one copy of this book");
+        }
+        if(bookData.getAvailableQuantity() <= 0) throw new BookNotAvailableException("No copies Available!");
+        Loan loan = new Loan();
+        loan.setMember(member);
+        loan.setBook(book);
+        loan.setBookData(bookData);
+        loan.setDueDate(loan.getIssueDate().plusDays(5));
+        book.setLoan(loan);
+        bookData.setAvailableQuantity(bookData.getAvailableQuantity() - 1);
+        member.getLoans().add(loan);
+        LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(loan);
+        loanResponseDto = loanResponseDto.withBookName(loan.getBook().getBookName());
+        return loanResponseDto;
+    }
+
+    @Override
+    @Transactional
+    public LoanResponseDto collectBook(int id){
+        Book book = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found!"));
+        Member member = book.getLoan().getMember();
+        if(!member.getLoans().stream()
+                .anyMatch(l -> l.getBook().getBookId() == id)){
+            throw new BookNotAvailableException("You have not borrowed this book!");
+        }
+        Loan loan = member.getLoans().stream()
+                .filter(l -> l.getBook().getBookId() == book.getBookId()).findFirst().orElseThrow(() -> new LoanNotFoundException("Loan not found!"));
+        LocalDateTime returnTime = LocalDateTime.now(ZoneId.of("UTC"));
+        loan.setLoanStatus(LoanStatus.PAID);
+        loan.setReturnDate(returnTime);
+        book.setLoan(null);
+        BookData bookData = bookDataRepository.findBybookName(book.getBookName().replaceAll(regex,"")).orElseThrow(() -> new BookNotFoundException("Book not found!"));
+        bookData.setAvailableQuantity(bookData.getAvailableQuantity() + 1);
+        LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(loan);
+        loanResponseDto = loanResponseDto.withBookName(loan.getBook().getBookName());
+        return loanResponseDto;
+    }
     @Override
     public JwtResponseDto loginValidation(AdminLoginRequestDto adminLoginRequestDto){
         Admin admin = adminRepository.findByAdminEmail(adminLoginRequestDto.adminEmail()).orElseThrow(() -> new MemberNotFoundException("Admin not found!"));

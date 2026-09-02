@@ -11,4 +11,6 @@ public interface AdminService {
     public MemberResponseDto getMember(int memberId);
     public MemberResponseDto payFine(int memberId,int fineAmount);
     public BookDataResponseDto addBook(BookDataRequestDto bookDataRequestDto);
+    public LoanResponseDto issueBook(int bookId, int memberId);
+    public LoanResponseDto collectBook(int id);
 }

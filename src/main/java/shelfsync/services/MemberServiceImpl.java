@@ -38,7 +38,7 @@ public class MemberServiceImpl implements MemberService{
     private final BookRepository bookRepository;
     @Value("${member.fine.threshold}")
     private int fineThreshold;
-    private final String regex = "\\s*-\\s*(?i)copy(\\s+\\d+)?";
+
     public MemberServiceImpl(MemberRepository memberRepository, BookDataRepository bookDataRepository, LoanRepository loanRepository, LoanMapper loanMapper, BookDataMapper bookDataMapper, BookRepository bookRepository) {
         this.memberRepository = memberRepository;
         this.bookDataRepository = bookDataRepository;
@@ -46,53 +46,6 @@ public class MemberServiceImpl implements MemberService{
         this.loanMapper = loanMapper;
         this.bookDataMapper = bookDataMapper;
         this.bookRepository = bookRepository;
-    }
-
-    @Override
-    @Transactional
-    public LoanResponseDto borrowBook(int bookId,int memberId){
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException("Book not found!"));
-        BookData bookData = book.getBookData();
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
-        if(member.getMemberStatus() == MemberStatus.RESTRICTED) throw new RestrictedAccessException("Member is Restricted!");
-        if(member.getLoans().stream()
-                .anyMatch(l -> l.getBook().getBookName().replaceAll(regex,"").equals(bookData.getBookName()))){
-            throw new BookAlreadyBorrowedException("This member has already borrowed one copy of this book");
-        }
-        if(bookData.getAvailableQuantity() <= 0) throw new BookNotAvailableException("No copies Available!");
-        Loan loan = new Loan();
-        loan.setMember(member);
-        loan.setBook(book);
-        loan.setBookData(bookData);
-        loan.setDueDate(loan.getIssueDate().plusDays(5));
-        book.setLoan(loan);
-        bookData.setAvailableQuantity(bookData.getAvailableQuantity() - 1);
-        member.getLoans().add(loan);
-        LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(loan);
-        loanResponseDto = loanResponseDto.withBookName(loan.getBook().getBookName());
-        return loanResponseDto;
-    }
-
-    @Override
-    @Transactional
-    public LoanResponseDto returnBook(int id){
-        Book book = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found!"));
-        Member member = book.getLoan().getMember();
-        if(!member.getLoans().stream()
-                .anyMatch(l -> l.getBook().getBookId() == id)){
-            throw new BookNotAvailableException("You have not borrowed this book!");
-        }
-        Loan loan = member.getLoans().stream()
-                .filter(l -> l.getBook().getBookId() == book.getBookId()).findFirst().orElseThrow(() -> new LoanNotFoundException("Loan not found!"));
-        LocalDateTime returnTime = LocalDateTime.now(ZoneId.of("UTC"));
-        loan.setLoanStatus(LoanStatus.PAID);
-        loan.setReturnDate(returnTime);
-        book.setLoan(null);
-        BookData bookData = bookDataRepository.findBybookName(book.getBookName().replaceAll(regex,"")).orElseThrow(() -> new BookNotFoundException("Book not found!"));
-        bookData.setAvailableQuantity(bookData.getAvailableQuantity() + 1);
-        LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(loan);
-        loanResponseDto = loanResponseDto.withBookName(loan.getBook().getBookName());
-        return loanResponseDto;
     }
 
     @Scheduled(fixedRate = 1000)

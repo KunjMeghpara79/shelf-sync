@@ -9,12 +9,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MemberService {
-    public LoanResponseDto borrowBook(int bookId, int memberId);
-    public LoanResponseDto returnBook(int id);
     public List<LoanResponseDto> getLoansReport();
     public List<LoanResponseDto> getLoanHistory();
     public List<BookDataResponseDto> getAvailableBooks();
     public BookDataResponseDto findByBookName(String bookName);
     public List<BookDataResponseDto> findByAuthorName(String authorName);
-
 }
