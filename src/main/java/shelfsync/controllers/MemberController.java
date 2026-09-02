@@ -20,7 +20,7 @@ public class MemberController {
         this.memberService = memberService;
     }
 
-    @GetMapping("/late-loans")
+    @GetMapping("/loans")
     public ResponseEntity<List<LoanResponseDto>> getLateloans(){
         List<LoanResponseDto> loanResponseDtos = memberService.getLoansReport();
         return new ResponseEntity<>(loanResponseDtos,HttpStatus.OK);
