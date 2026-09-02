@@ -34,7 +34,7 @@ public class AdminTests {
         member.setFine(10);
         member.setMemberEmail("kunj@gmail.com");
         memberRepository.save(member);
-        adminService.payFine(1,10);
+        adminService.collectFine(1,10);
     }
 
     @Test

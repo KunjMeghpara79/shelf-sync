@@ -60,7 +60,7 @@ public class AdminController {
 
     @PutMapping("/{memberId}/{fineAmount}")
     public ResponseEntity<MemberResponseDto> finePay(@PathVariable int memberId, @PathVariable int fineAmount) {
-        MemberResponseDto memberResponseDto = adminService.payFine(memberId, fineAmount);
+        MemberResponseDto memberResponseDto = adminService.collectFine(memberId, fineAmount);
         return new ResponseEntity<>(memberResponseDto, HttpStatus.OK);
     }
 

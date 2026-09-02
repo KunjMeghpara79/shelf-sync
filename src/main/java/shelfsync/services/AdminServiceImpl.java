@@ -135,7 +135,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public MemberResponseDto payFine(int memberId,int fineAmount){
+    public MemberResponseDto collectFine(int memberId, int fineAmount){
         if(fineAmount <=0 )throw new FinePayException("Amount can not be zero or negative");
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
         if(member.getFine() < fineAmount) throw new FinePayException("fine amount is exceeding the total fine!");
@@ -156,7 +156,6 @@ public class AdminServiceImpl implements AdminService {
             book.setLoan(null);
             bookRepository.save(book);
         }
-
         return bookDataMapper.bookDatatoBookDataResponseDto(bookData);
     }
 
