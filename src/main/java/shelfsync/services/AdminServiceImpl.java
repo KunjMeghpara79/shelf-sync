@@ -24,7 +24,6 @@ import java.util.List;
 @Service
 public class AdminServiceImpl implements AdminService {
 
-
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -35,7 +34,6 @@ public class AdminServiceImpl implements AdminService {
     private final BookDataRepository bookDataRepository;
     private final BookDataMapper bookDataMapper;
     private final BookRepository bookRepository;
-
     private final String regex = "\\s*-\\s*(?i)copy(\\s+\\d+)?";
     public AdminServiceImpl(AdminRepository adminRepository, PasswordEncoder passwordEncoder, JwtService jwtService, LoanRepository loanRepository, LoanMapper loanMapper, MemberMapper memberMapper, MemberRepository memberRepository, BookDataRepository bookDataRepository, BookDataMapper bookDataMapper, BookRepository bookRepository) {
         this.adminRepository = adminRepository;
@@ -49,8 +47,6 @@ public class AdminServiceImpl implements AdminService {
         this.bookDataMapper = bookDataMapper;
         this.bookRepository = bookRepository;
     }
-
-
 
     @Override
     @Transactional
