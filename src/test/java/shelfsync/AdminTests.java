@@ -3,8 +3,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
+import shelfsync.exceptions.MemberNotFoundException;
 import shelfsync.models.dto.BookDataRequestDto;
 import shelfsync.models.dto.LoanResponseDto;
+import shelfsync.models.dto.MemberResponseDto;
+import shelfsync.models.entities.Loan;
 import shelfsync.models.entities.Member;
 import shelfsync.repositories.MemberRepository;
 import shelfsync.services.interfaces.AdminService;
@@ -29,11 +32,7 @@ public class AdminTests {
     @Test
     @WithMockUser(username = "admin@gmail.com", roles = "ADMIN")
     public void collectFineTest(){
-        Member member = new Member();
-        member.setMemberName("Kunj");
-        member.setFine(10);
-        member.setMemberEmail("kunj@gmail.com");
-        memberRepository.save(member);
+
         adminService.collectFine(1,10);
     }
 
@@ -42,5 +41,19 @@ public class AdminTests {
     public void addBookTest(){
         BookDataRequestDto bookDataRequestDto = new BookDataRequestDto("48 laws of power","Robert green",3);
         adminService.addBook(bookDataRequestDto);
+    }
+
+    @Test
+    @WithMockUser(username = "admin@gmail.com", roles = "ADMIN")
+    public void getMemberTest(){
+        MemberResponseDto member = adminService.getMember(1);
+        System.out.println(member);
+    }
+
+    @Test
+    @WithMockUser(username = "admin@gmail.com", roles = "ADMIN")
+    public void getMemberLoansTest(){
+        List<LoanResponseDto> loans = adminService.getMemberLoans(1);
+        System.out.println(loans);
     }
 }
