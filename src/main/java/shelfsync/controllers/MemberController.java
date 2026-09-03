@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shelfsync.models.dto.BookDataResponseDto;
 import shelfsync.models.dto.LoanResponseDto;
+import shelfsync.models.dto.SearchRequestDto;
 import shelfsync.models.entities.BookData;
 import shelfsync.services.MemberServiceImpl;
 import shelfsync.services.interfaces.MemberService;
@@ -38,15 +39,15 @@ public class MemberController {
         return new ResponseEntity<>(bookDataResponseDtos,HttpStatus.OK);
     }
 
-    @GetMapping("/find-by-name/{bookName}")
-    public ResponseEntity<List<BookDataResponseDto>> findBookByBookName(@PathVariable String bookName){
-        List<BookDataResponseDto> bookData = memberService.findByBookName(bookName);
+    @PostMapping("/find-by-name")
+    public ResponseEntity<List<BookDataResponseDto>> findBookByBookName(@RequestBody SearchRequestDto searchRequestDto){
+        List<BookDataResponseDto> bookData = memberService.findByBookName(searchRequestDto);
         return new ResponseEntity<>(bookData,HttpStatus.OK);
     }
 
-    @GetMapping("find-by-authorname/{authorName}")
-    public ResponseEntity<List<BookDataResponseDto>> findByAuthorname(@PathVariable String authorName){
-        List<BookDataResponseDto> bookDataResponseDtos = memberService.findByAuthorName(authorName);
+    @PostMapping("find-by-authorname")
+    public ResponseEntity<List<BookDataResponseDto>> findByAuthorname(@RequestBody SearchRequestDto searchRequestDto){
+        List<BookDataResponseDto> bookDataResponseDtos = memberService.findByAuthorName(searchRequestDto);
         return new ResponseEntity<>(bookDataResponseDtos,HttpStatus.OK);
     }
 }

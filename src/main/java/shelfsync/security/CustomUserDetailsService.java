@@ -50,7 +50,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                     .build();
         }
 
-        throw new UsernameNotFoundException("No system user found for: " + username);
+        throw new UsernameNotFoundException("No system user found !");
     }
 
 }

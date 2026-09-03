@@ -32,7 +32,6 @@ public class AdminTests {
     @Test
     @WithMockUser(username = "admin@gmail.com", roles = "ADMIN")
     public void collectFineTest(){
-
         adminService.collectFine(1,10);
     }
 

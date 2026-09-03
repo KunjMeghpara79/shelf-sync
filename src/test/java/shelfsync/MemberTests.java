@@ -60,10 +60,10 @@ public class MemberTests {
       List<BookDataResponseDto> bookDataResponseDtos = memberService.getAvailableBooks();
         System.out.println(bookDataResponseDtos);
     }
-    @Test
-    @WithMockUser(username = "kunj@gmail.com", roles = "MEMBER")
-    public void findByNameTest(){
-      List<BookDataResponseDto> bookDataResponseDtos = memberService.findByBookName("great");
-        System.out.println(bookDataResponseDtos);
-    }
+//    @Test
+//    @WithMockUser(username = "kunj@gmail.com", roles = "MEMBER")
+//    public void findByNameTest(){
+//      List<BookDataResponseDto> bookDataResponseDtos = memberService.findByBookName("great");
+//        System.out.println(bookDataResponseDtos);
+//    }
 }

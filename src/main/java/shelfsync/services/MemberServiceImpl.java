@@ -12,6 +12,7 @@ import shelfsync.mappers.BookDataMapper;
 import shelfsync.mappers.LoanMapper;
 import shelfsync.models.dto.BookDataResponseDto;
 import shelfsync.models.dto.LoanResponseDto;
+import shelfsync.models.dto.SearchRequestDto;
 import shelfsync.models.entities.BookData;
 import shelfsync.models.entities.Loan;
 import shelfsync.models.entities.Member;
@@ -95,15 +96,15 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
-    public List<BookDataResponseDto> findByBookName(String bookName) {
-        List<BookData> bookData = bookDataRepository.findBybookNameContainingIgnoreCase(bookName).orElseThrow(() -> new BookNotFoundException("Book not found!"));
+    public List<BookDataResponseDto> findByBookName(SearchRequestDto searchRequestDto) {
+        List<BookData> bookData = bookDataRepository.findBybookNameContainingIgnoreCase(searchRequestDto.name()).orElseThrow(() -> new BookNotFoundException("Book not found!"));
         return bookData.stream()
                 .map(b -> bookDataMapper.bookDatatoBookDataResponseDto(b)).toList();
     }
 
     @Override
-    public List<BookDataResponseDto> findByAuthorName(String authorName) {
-        List<BookData> bookData = bookDataRepository.findByauthorNameContainingIgnoreCase(authorName).orElseThrow(() -> new BookNotFoundException("No books available of the author " + authorName));
+    public List<BookDataResponseDto> findByAuthorName(SearchRequestDto searchRequestDto) {
+        List<BookData> bookData = bookDataRepository.findByauthorNameContainingIgnoreCase(searchRequestDto.name()).orElseThrow(() -> new BookNotFoundException("No books available of the author " + searchRequestDto.name()));
         return bookData.stream()
                 .map(b -> bookDataMapper.bookDatatoBookDataResponseDto(b)).toList();
     }
