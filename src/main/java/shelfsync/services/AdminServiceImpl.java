@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -67,7 +68,7 @@ public class AdminServiceImpl implements AdminService {
         loan.setMember(member);
         loan.setBook(book);
        // loan.setBookData(bookData);
-        loan.setDueDate(loan.getIssueDate().plusDays(5));
+        loan.setDueDate(loan.getIssueDate().plusSeconds(5));
         book.setLoan(loan);
         bookData.getLoans().add(loan);
         member.getLoans().add(loan);
@@ -144,6 +145,9 @@ public class AdminServiceImpl implements AdminService {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
         if(member.getFine() <= 0) throw new FinePayException("Member have no fine to pay!");
         if(member.getFine() < fineAmount) throw new FinePayException("fine amount is exceeding the total fine!");
+        if(member.getLoans().stream().anyMatch(l -> l.getLoanStatus() == LoanStatus.DUE)){throw new RestrictedAccessException("You have to complete all late book returns first then you can pay fine !");}
+        Loan loan = member.getLoans().stream().filter(l -> l.getFine() == fineAmount).findFirst().orElseThrow(() -> new LoanNotFoundException("No loan found of " + fineAmount + " Rs !"));
+        loan.setFine(0);
         member.setFine(member.getFine() - fineAmount);
         if(member.getFine() < fineThreshold) member.setMemberStatus(MemberStatus.ACTIVE);
         memberRepository.save(member);
