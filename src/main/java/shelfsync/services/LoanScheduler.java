@@ -40,7 +40,7 @@ public class LoanScheduler {
         loanRepository.saveAll(loans);
     }
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 3600000)
     @Transactional
     public void addFines(){
         LocalDateTime now = LocalDateTime.now(ZoneId.of("UTC"));

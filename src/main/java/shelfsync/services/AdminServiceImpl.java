@@ -68,7 +68,7 @@ public class AdminServiceImpl implements AdminService {
         loan.setMember(member);
         loan.setBook(book);
        // loan.setBookData(bookData);
-        loan.setDueDate(loan.getIssueDate().plusSeconds(5));
+        loan.setDueDate(loan.getIssueDate().plusDays(5));
         book.setLoan(loan);
         bookData.getLoans().add(loan);
         member.getLoans().add(loan);
