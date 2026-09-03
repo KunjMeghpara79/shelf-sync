@@ -13,6 +13,7 @@ public interface LoanRepository extends JpaRepository<Loan,Integer> {
             LocalDateTime dateTime,
             LoanStatus loanStatus
     );
-    List<Loan> findByLoanStatusAndMember(LoanStatus loanStatus, Member member);
-    List<Loan> findByLoanStatus(LoanStatus loanStatus);
+    List<Loan> findByLoanStatusInAndMember(List<LoanStatus> loanStatuses, Member member);
+    List<Loan> findByLoanStatusIn(List<LoanStatus> statuses);
+
 }

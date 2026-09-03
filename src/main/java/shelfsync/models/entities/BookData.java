@@ -25,18 +25,19 @@ public class BookData {
     @Column(name = "author")
     private String authorName;
 
-    @Column(name = "available_quantity")
-    private int availableQuantity;
+
+//    @Column(name = "available_quantity")
+//    private int availableQuantity;
 
     @OneToMany(mappedBy = "bookData", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Book> books;
 
-    @OneToMany(mappedBy = "bookData", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Loan> loans;
+   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+   @JoinColumn(name = "book_data_id")
+   private Set<Loan> loans;
 
-    public BookData(String bookName, int totalQuantity, int availableQuantity){
+    public BookData(String bookName, int totalQuantity){
         this.bookName = bookName;
-        this.availableQuantity=availableQuantity;
         this.totalQuantity = totalQuantity;
     }
 }

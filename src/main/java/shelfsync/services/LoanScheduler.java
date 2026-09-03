@@ -2,6 +2,7 @@ package shelfsync.services;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LoanScheduler {
 
     private final LoanRepository loanRepository;
@@ -42,8 +44,10 @@ public class LoanScheduler {
     @Transactional
     public void addFines(){
         LocalDateTime now = LocalDateTime.now(ZoneId.of("UTC"));
-        List<Loan> loans = loanRepository.findByLoanStatus(LoanStatus.DUE);
+        List<Loan> loans = loanRepository.findByLoanStatusIn(List.of(LoanStatus.DUE));
         for(Loan loan : loans){
+            loan.setFine(loan.getFine() + FIXED_FINE);
+            log.info(String.valueOf(loan.getFine()));
             Member member = loan.getMember();
             member.setFine(member.getFine() + FIXED_FINE);
         }

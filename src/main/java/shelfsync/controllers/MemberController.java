@@ -39,8 +39,8 @@ public class MemberController {
     }
 
     @GetMapping("/find-by-name/{bookName}")
-    public ResponseEntity<BookDataResponseDto> findBookByBookName(@PathVariable String bookName){
-        BookDataResponseDto bookData = memberService.findByBookName(bookName);
+    public ResponseEntity<List<BookDataResponseDto>> findBookByBookName(@PathVariable String bookName){
+        List<BookDataResponseDto> bookData = memberService.findByBookName(bookName);
         return new ResponseEntity<>(bookData,HttpStatus.OK);
     }
 

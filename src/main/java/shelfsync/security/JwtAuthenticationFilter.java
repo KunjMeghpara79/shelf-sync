@@ -1,4 +1,5 @@
 package shelfsync.security;
+import io.jsonwebtoken.MalformedJwtException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -83,7 +84,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "JWT is tampered");
             objectMapper.writeValue(response.getWriter(), errorResponse);
             return;
-        }catch (UsernameNotFoundException ex){
+        }
+        catch (MalformedJwtException ex){
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setContentType("application/json");
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "JWT is tampered");
+            objectMapper.writeValue(response.getWriter(), errorResponse);
+            return;
+        }
+        catch (UsernameNotFoundException ex){
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType("application/json");
             ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());

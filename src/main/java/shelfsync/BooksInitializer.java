@@ -75,7 +75,7 @@ public class BooksInitializer implements CommandLineRunner {
 
             int totalQty = 3 + (i % 3);
 
-            BookData bookData = new BookData(title, totalQty, totalQty);
+            BookData bookData = new BookData(title, totalQty);
             bookData.setAuthorName(author);
             bookData.setBooks(new HashSet<>());
             bookDataListToSave.add(bookData);

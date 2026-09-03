@@ -8,6 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BookDataRepository extends JpaRepository<BookData,Integer> {
-    public Optional<BookData> findBybookName(String bookName);
-    public Optional<List<BookData>> findByauthorName(String authorName);
+    public Optional<List<BookData>> findBybookNameContainingIgnoreCase(String bookName);
+    public Optional<List<BookData>> findByauthorNameContainingIgnoreCase(String authorName);
 }
