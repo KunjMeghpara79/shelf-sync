@@ -86,6 +86,7 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
+    @Transactional
     public List<BookDataResponseDto> getAvailableBooks(){
         List<BookData> bookData = bookDataRepository.findAll();
         bookData = bookData.stream()
