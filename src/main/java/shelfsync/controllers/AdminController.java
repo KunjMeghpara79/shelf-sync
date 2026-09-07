@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import shelfsync.models.dto.*;
 import shelfsync.services.MemberServiceImpl;
 import shelfsync.services.interfaces.AdminService;
-import shelfsync.services.interfaces.MemberService;
 
 import java.util.List;
 
