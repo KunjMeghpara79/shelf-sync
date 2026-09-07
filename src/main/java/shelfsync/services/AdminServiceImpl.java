@@ -80,8 +80,8 @@ public class AdminServiceImpl implements AdminService {
         Book book = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found!"));
         if(book.getLoan() == null) throw new LoanNotFoundException("No loan found for this book!");
         Member member = book.getLoan().getMember();
-        if(!member.getLoans().stream()
-                .anyMatch(l -> l.getBook().getBookId() == id)){
+        if(member.getLoans().stream()
+                .noneMatch(l -> l.getBook().getBookId() == id)){
             throw new BookNotAvailableException("You have not borrowed this book!");
         }
         Loan loan = member.getLoans().stream()
@@ -111,23 +111,22 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public List<LoanResponseDto> getLoansReport(){
         List<Loan> loans = loanRepository.findByLoanStatusIn(List.of(LoanStatus.DUE,LoanStatus.PENDING));
-        List<LoanResponseDto> loanResponseDtos = loans.stream()
+        return loans.stream()
                 .map(l ->{
                     LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(l);
                     return loanResponseDto.withBookName(l.getMember().getMemberName(),l.getBook().getBookName());
                 }).toList();
-        return loanResponseDtos;
+
     }
 
     @Override
     public List<LoanResponseDto> getMemberLoans(int memberId){
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
-        List<LoanResponseDto> loanResponseDtos = member.getLoans().stream()
+        return member.getLoans().stream()
                 .map(l -> {
                     LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(l);
                     return loanResponseDto.withBookName(member.getMemberName(),l.getBook().getBookName());
                 }).toList();
-        return loanResponseDtos;
     }
 
     @Override
