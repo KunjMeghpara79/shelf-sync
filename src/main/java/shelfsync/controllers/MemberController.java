@@ -6,11 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import shelfsync.models.dto.BookDataResponseDto;
 import shelfsync.models.dto.LoanResponseDto;
 import shelfsync.models.dto.SearchRequestDto;
-import shelfsync.models.entities.BookData;
-import shelfsync.services.MemberServiceImpl;
 import shelfsync.services.interfaces.MemberService;
 
-import java.awt.print.Book;
 import java.util.List;
 
 @RestController

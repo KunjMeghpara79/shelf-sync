@@ -15,7 +15,6 @@ import shelfsync.models.entities.Member;
 import shelfsync.repositories.LoanRepository;
 import shelfsync.repositories.MemberRepository;
 import shelfsync.services.interfaces.MemberService;
-
 import java.util.List;
 import java.util.Optional;
 
