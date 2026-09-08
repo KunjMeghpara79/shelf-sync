@@ -62,13 +62,12 @@ public class MemberServiceImpl implements MemberService{
 
         List<Loan> loans = loanRepository.findByLoanStatusInAndMember(List.of(LoanStatus.DUE,LoanStatus.PENDING),member);
 
-        List<LoanResponseDto> loanResponseDtos = loans.stream()
+        return loans.stream()
                 .map(l -> {
                     LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(l);
                    return loanResponseDto.withBookName(member.getMemberName(),l.getBook().getBookName());
 
                 }).toList();
-        return loanResponseDtos;
     }
 
     @Override
@@ -76,13 +75,13 @@ public class MemberServiceImpl implements MemberService{
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Member member = memberRepository.findByMemberEmail(email).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
         List<Loan> loans = loanRepository.findByLoanStatusInAndMember(List.of(LoanStatus.PAID),member);
-        List<LoanResponseDto> loanResponseDtos = loans.stream()
+        return loans.stream()
                 .map(l -> {
                     LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(l);
                     return loanResponseDto.withBookName(member.getMemberName(),l.getBook().getBookName());
 
                 }).toList();
-        return loanResponseDtos;
+
     }
 
     @Override
@@ -91,9 +90,8 @@ public class MemberServiceImpl implements MemberService{
         List<BookData> bookData = bookDataRepository.findAll();
         bookData = bookData.stream()
                 .filter(b -> b.getTotalQuantity() - b.getLoans().size() > 0).toList();
-        List<BookDataResponseDto> bookDataResponseDtos= bookData.stream()
+        return bookData.stream()
                 .map(b -> bookDataMapper.bookDatatoBookDataResponseDto(b)).toList();
-        return bookDataResponseDtos;
     }
 
     @Override
