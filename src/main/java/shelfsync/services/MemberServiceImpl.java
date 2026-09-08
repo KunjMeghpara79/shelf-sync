@@ -79,9 +79,7 @@ public class MemberServiceImpl implements MemberService{
                 .map(l -> {
                     LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(l);
                     return loanResponseDto.withBookName(member.getMemberName(),l.getBook().getBookName());
-
                 }).toList();
-
     }
 
     @Override
