@@ -47,6 +47,8 @@ public class Loan {
 
 
 
+
+
 //    @JoinColumn(name = "book_data_id")
 //    @ManyToOne(fetch = FetchType.EAGER)
 //    private BookData bookData;
