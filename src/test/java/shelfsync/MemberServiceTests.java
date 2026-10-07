@@ -8,17 +8,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import shelfsync.enums.LoanStatus;
+import shelfsync.enums.MemberStatus;
 import shelfsync.models.dto.BookDataResponseDto;
 import shelfsync.models.dto.LoanResponseDto;
 import shelfsync.models.dto.SearchRequestDto;
 import shelfsync.models.entities.Member;
 import shelfsync.repositories.LoanRepository;
 import shelfsync.repositories.MemberRepository;
+import shelfsync.services.interfaces.EmailService;
 import shelfsync.services.interfaces.MemberService;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.Mockito.when;
+import static jdk.internal.org.objectweb.asm.util.CheckClassAdapter.verify;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 public class MemberServiceTests {
@@ -83,5 +87,4 @@ public class MemberServiceTests {
         List<BookDataResponseDto> bookDataResponseDto = memberService.findByAuthorName(new SearchRequestDto("scott"));
         System.out.println(bookDataResponseDto);
     }
-
 }

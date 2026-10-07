@@ -20,6 +20,7 @@ import shelfsync.repositories.BookDataRepository;
 import shelfsync.repositories.BookRepository;
 import shelfsync.repositories.LoanRepository;
 import shelfsync.repositories.MemberRepository;
+import shelfsync.services.interfaces.EmailService;
 import shelfsync.services.interfaces.MemberService;
 
 import java.util.List;
@@ -34,16 +35,18 @@ public class MemberServiceImpl implements MemberService{
     private final LoanMapper loanMapper;
     private final BookDataMapper bookDataMapper;
     private final BookRepository bookRepository;
+    private final EmailService emailService;
     @Value("${member.fine.threshold}")
     private int fineThreshold;
 
-    public MemberServiceImpl(MemberRepository memberRepository, BookDataRepository bookDataRepository, LoanRepository loanRepository, LoanMapper loanMapper, BookDataMapper bookDataMapper, BookRepository bookRepository) {
+    public MemberServiceImpl(MemberRepository memberRepository, BookDataRepository bookDataRepository, LoanRepository loanRepository, LoanMapper loanMapper, BookDataMapper bookDataMapper, BookRepository bookRepository, EmailService emailService) {
         this.memberRepository = memberRepository;
         this.bookDataRepository = bookDataRepository;
         this.loanRepository = loanRepository;
         this.loanMapper = loanMapper;
         this.bookDataMapper = bookDataMapper;
         this.bookRepository = bookRepository;
+        this.emailService = emailService;
     }
 
     @Scheduled(fixedRate = 1000)
@@ -51,7 +54,7 @@ public class MemberServiceImpl implements MemberService{
     public void restrictMembers(){
         List<Member> members = memberRepository.findByFineGreaterThanEqualAndMemberStatus(fineThreshold,MemberStatus.ACTIVE);
         for(Member member : members){
-            member.setMemberStatus(MemberStatus.RESTRICTED);
+            member.restrictMember(emailService);
         }
     }
 
