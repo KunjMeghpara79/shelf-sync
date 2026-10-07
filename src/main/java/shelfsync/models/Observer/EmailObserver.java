@@ -1,6 +1,5 @@
 package shelfsync.models.Observer;
 
-import shelfsync.models.Observer.Interfaces.MemberObserver;
 import shelfsync.models.entities.EmailDetails;
 import shelfsync.models.entities.Member;
 import shelfsync.services.interfaces.EmailService;

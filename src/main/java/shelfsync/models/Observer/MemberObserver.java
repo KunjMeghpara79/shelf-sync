@@ -1,4 +1,4 @@
-package shelfsync.models.Observer.Interfaces;
+package shelfsync.models.Observer;
 
 import shelfsync.models.entities.Member;
 

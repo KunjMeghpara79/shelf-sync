@@ -3,8 +3,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
 import shelfsync.enums.MemberStatus;
-import shelfsync.models.Observer.Interfaces.MemberObserver;
-import shelfsync.services.interfaces.EmailService;
+import shelfsync.models.Observer.MemberObserver;
 
 import java.util.ArrayList;
 import java.util.HashSet;
