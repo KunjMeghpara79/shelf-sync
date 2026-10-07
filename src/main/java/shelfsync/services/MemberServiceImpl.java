@@ -54,7 +54,7 @@ public class MemberServiceImpl implements MemberService{
     public void restrictMembers(){
         List<Member> members = memberRepository.findByFineGreaterThanEqualAndMemberStatus(fineThreshold,MemberStatus.ACTIVE);
         for(Member member : members){
-            member.restrictMember(emailService);
+            member.restrictMember();
         }
     }
 
