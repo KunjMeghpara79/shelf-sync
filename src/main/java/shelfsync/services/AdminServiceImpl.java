@@ -54,10 +54,10 @@ public class AdminServiceImpl implements AdminService {
     @Transactional
     public LoanResponseDto issueBook(int bookId, int memberId){
         Optional<Book> book = bookRepository.findById(bookId);
-        if(!book.isPresent()) throw new BookNotFoundException("Book not found !");
+        if(book.isEmpty()) throw new BookNotFoundException("Book not found !");
         BookData bookData = book.get().getBookData();
         Optional<Member> member = memberRepository.findById(memberId);
-        if(!member.isPresent()) throw new MemberNotFoundException("Member not found !");
+        if(member.isEmpty()) throw new MemberNotFoundException("Member not found !");
         Request request = new Request(book.get(),bookData,member.get());
 
         AlreadyBorrowedHandler alreadyBorrowedHandler = new AlreadyBorrowedHandler();
@@ -85,13 +85,11 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional
     public LoanResponseDto collectBook(int id){
-        Book book = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found!"));
-        if(book.getLoan() == null) throw new LoanNotFoundException("No loan found for this book!");
+        Book book = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found !"));
+
+        if(book.getLoan() == null) throw new LoanNotFoundException("No loan found for this book !");
         Member member = book.getLoan().getMember();
-        if(member.getLoans().stream()
-                .noneMatch(l -> l.getBook().getBookId() == id)){
-            throw new BookNotAvailableException("You have not borrowed this book!");
-        }
+
         Loan loan = member.getLoans().stream()
                 .filter(l -> l.getBook().getBookId() == book.getBookId()).findFirst().orElseThrow(() -> new LoanNotFoundException("Loan not found!"));
         LocalDateTime returnTime = LocalDateTime.now(ZoneId.of("UTC"));
