@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import shelfsync.borrowchain.*;
 import shelfsync.enums.LoanStatus;
 import shelfsync.enums.MemberStatus;
 import shelfsync.exceptions.*;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -51,26 +53,32 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional
     public LoanResponseDto issueBook(int bookId, int memberId){
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException("Book not found!"));
-        BookData bookData = book.getBookData();
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
-        if(book.getLoan() != null) throw new BookNotAvailableException("This book is already borrowed");
-        if(member.getMemberStatus() == MemberStatus.RESTRICTED) throw new RestrictedAccessException("Member is Restricted!");
-        if(member.getLoans().stream()
-                .anyMatch(l -> l.getBook().getBookName().equals(bookData.getBookName()))){
-            throw new BookAlreadyBorrowedException("This member has already borrowed one copy of this book");
-        }
-        if(bookData.getTotalQuantity() - bookData.getLoans().size() <= 0) throw new BookNotAvailableException("No copies Available!");
+        Optional<Book> book = bookRepository.findById(bookId);
+        if(!book.isPresent()) throw new BookNotFoundException("Book not found !");
+        BookData bookData = book.get().getBookData();
+        Optional<Member> member = memberRepository.findById(memberId);
+        if(!member.isPresent()) throw new MemberNotFoundException("Member not found !");
+        Request request = new Request(book.get(),bookData,member.get());
+
+        AlreadyBorrowedHandler alreadyBorrowedHandler = new AlreadyBorrowedHandler();
+        RestrictedMemberHandler restrictedMemberHandler = new RestrictedMemberHandler();
+        DuplicateCopyHandler duplicateCopyHandler = new DuplicateCopyHandler();
+        QuantityHandler quantityHandler = new QuantityHandler();
+
+        alreadyBorrowedHandler.setNext(restrictedMemberHandler);
+        restrictedMemberHandler.setNext(duplicateCopyHandler);
+        duplicateCopyHandler.setNext(quantityHandler);
+        alreadyBorrowedHandler.check(request);
+
         Loan loan = new Loan();
-        loan.setMember(member);
-        loan.setBook(book);
-       // loan.setBookData(bookData);
+        loan.setMember(member.get());
+        loan.setBook(book.get());
         loan.setDueDate(loan.getIssueDate().plusDays(5));
-        book.setLoan(loan);
+        book.get().setLoan(loan);
         bookData.getLoans().add(loan);
-        member.getLoans().add(loan);
+        member.get().getLoans().add(loan);
         LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(loan);
-        loanResponseDto = loanResponseDto.withBookName(member.getMemberName(),loan.getBook().getBookName());
+        loanResponseDto = loanResponseDto.withBookName(member.get().getMemberName(),loan.getBook().getBookName());
         return loanResponseDto;
     }
 
@@ -90,8 +98,6 @@ public class AdminServiceImpl implements AdminService {
         loan.setLoanStatus(LoanStatus.PAID);
         loan.setReturnDate(returnTime);
         book.setLoan(null);
-//        BookData bookData = bookDataRepository.findBybookName(book.getBookName()).orElseThrow(() -> new BookNotFoundException("Book not found!"));
-//        bookData.setAvailableQuantity(bookData.getAvailableQuantity() + 1);
         BookData bookData = book.getBookData();
         bookData.getLoans().remove(loan);
         LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(loan);
