@@ -122,18 +122,12 @@ public class GlobalExceptionHandler {
                         .map(FieldError::getDefaultMessage)
                         .collect(Collectors.joining(", "));
 
-                yield new ErrorResponse(
-                        HttpStatus.BAD_REQUEST.value(),
-                        "Validation Failed: " + errorMessage
-                );
+                yield new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Validation Failed: " + errorMessage);
             }
 
             case HttpMessageNotReadableException e -> {
 
-                yield new ErrorResponse(
-                        HttpStatus.BAD_REQUEST.value(),
-                        "Error: Invalid JSON structure or incorrect data types."
-                );
+                yield new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Error: Invalid JSON structure or incorrect data types.");
             }
 
             case MethodArgumentTypeMismatchException e -> {
