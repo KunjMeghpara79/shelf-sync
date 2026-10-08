@@ -107,7 +107,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             MethodArgumentNotValidException.class,
             HttpMessageNotReadableException.class,
-            MethodArgumentTypeMismatchException.class
+            MethodArgumentTypeMismatchException.class,
+            InvalidFormatException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleBadInput(Exception ex) {
@@ -145,11 +146,13 @@ public class GlobalExceptionHandler {
                         "Error: " + message
                 );
             }
-
+            case InvalidFormatException e -> {
+                yield new ErrorResponse(HttpStatus.BAD_REQUEST.value(),ex.getMessage());
+            }
             default ->
                     new ErrorResponse(
                             HttpStatus.BAD_REQUEST.value(),
-                            "Invalid input provided"
+                            ex.getMessage()
                     );
         };
     }

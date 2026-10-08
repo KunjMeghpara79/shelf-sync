@@ -53,6 +53,8 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional
     public LoanResponseDto issueBook(int bookId, int memberId){
+        if(bookId <=0) throw new InvalidFormatException("book id can not be zero or negative !");
+        if(memberId <=0)throw new InvalidFormatException("Member id can not be zero or negative !");
         Optional<Book> book = bookRepository.findById(bookId);
         if(book.isEmpty()) throw new BookNotFoundException("Book not found !");
         BookData bookData = book.get().getBookData();
@@ -85,6 +87,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional
     public LoanResponseDto collectBook(int id){
+        if(id <=0) throw new InvalidFormatException("Book id can not be zero or negative !");
         Book book = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found !"));
 
         if(book.getLoan() == null) throw new LoanNotFoundException("No loan found for this book !");
@@ -125,6 +128,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<LoanResponseDto> getMemberLoans(int memberId){
+        if(memberId <=0) throw new InvalidFormatException("Member id can not be zero or negative !");
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
         return member.getLoans().stream()
                 .map(l -> {
@@ -135,12 +139,14 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public MemberResponseDto getMember(int memberId){
+        if(memberId <=0) throw new InvalidFormatException("Member id can not be zero or negative !");
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
         return memberMapper.memberToMemberResponseDto(member);
     }
 
     @Override
     public MemberResponseDto collectFine(int memberId, int fineAmount){
+        if(memberId <=0) throw new InvalidFormatException("Member id can not be zero or negative !");
         if(fineAmount <=0 )throw new FinePayException("Amount can not be zero or negative");
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
         if(member.getFine() <= 0) throw new FinePayException("Member have no fine to pay!");
