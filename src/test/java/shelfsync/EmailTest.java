@@ -3,8 +3,7 @@ package shelfsync;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import shelfsync.enums.MemberStatus;
-import shelfsync.models.Observer.EmailObserver;
+import shelfsync.models.observers.EmailObserver;
 import shelfsync.models.entities.Member;
 import shelfsync.services.interfaces.EmailService;
 

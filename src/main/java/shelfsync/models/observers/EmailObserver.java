@@ -1,4 +1,4 @@
-package shelfsync.models.Observer;
+package shelfsync.models.observers;
 
 import shelfsync.models.entities.EmailDetails;
 import shelfsync.models.entities.Member;
