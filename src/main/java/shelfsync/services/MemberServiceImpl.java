@@ -21,7 +21,6 @@ import shelfsync.repositories.BookRepository;
 import shelfsync.repositories.LoanRepository;
 import shelfsync.repositories.MemberRepository;
 import shelfsync.services.interfaces.MemberService;
-
 import java.util.List;
 
 
