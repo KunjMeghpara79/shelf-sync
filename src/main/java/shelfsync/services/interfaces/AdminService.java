@@ -5,12 +5,12 @@ import shelfsync.models.dto.*;
 import java.util.List;
 
 public interface AdminService {
-    public JwtResponseDto loginValidation(AdminLoginRequestDto adminLoginRequestDto);
-    public List<LoanResponseDto> getLoansReport();
-    public List<LoanResponseDto> getMemberLoans(int memberId);
-    public MemberResponseDto getMember(int memberId);
-    public MemberResponseDto collectFine(int memberId, int fineAmount);
-    public BookDataResponseDto addBook(BookDataRequestDto bookDataRequestDto);
-    public LoanResponseDto issueBook(int bookId, int memberId);
-    public LoanResponseDto collectBook(int id);
+    JwtResponseDto loginValidation(AdminLoginRequestDto adminLoginRequestDto);
+    List<LoanResponseDto> getLoansReport();
+    List<LoanResponseDto> getMemberLoans(int memberId);
+    MemberResponseDto getMember(int memberId);
+    MemberResponseDto collectFine(int memberId, int fineAmount);
+    BookDataResponseDto addBook(BookDataRequestDto bookDataRequestDto);
+    LoanResponseDto issueBook(int bookId, int memberId);
+    LoanResponseDto collectBook(int id);
 }

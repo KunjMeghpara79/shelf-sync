@@ -12,7 +12,7 @@ public class RestrictedMemberHandler implements BorrowHandler{
 
     @Override
     public void check(Request request) {
-        if(request.getMember().getMemberStatus() == MemberStatus.RESTRICTED) throw new RestrictedAccessException("Member is restricted !");
+        if(request.member().getMemberStatus() == MemberStatus.RESTRICTED) throw new RestrictedAccessException("Member is restricted !");
         else next.check(request);
     }
 }

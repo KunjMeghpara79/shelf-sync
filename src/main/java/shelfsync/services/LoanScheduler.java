@@ -10,7 +10,6 @@ import shelfsync.enums.LoanStatus;
 import shelfsync.models.entities.Loan;
 import shelfsync.models.entities.Member;
 import shelfsync.repositories.LoanRepository;
-import shelfsync.repositories.MemberRepository;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -21,7 +20,6 @@ import java.util.List;
 public class LoanScheduler {
 
     private final LoanRepository loanRepository;
-    private final MemberRepository memberRepository;
 
     @Value("${loan.fine.fixedrate}")
     private int FIXED_FINE;
@@ -43,7 +41,6 @@ public class LoanScheduler {
     @Scheduled(fixedRate = 3600000)
     @Transactional
     public void addFines(){
-        LocalDateTime now = LocalDateTime.now(ZoneId.of("UTC"));
         List<Loan> loans = loanRepository.findByLoanStatusIn(List.of(LoanStatus.DUE));
         for(Loan loan : loans){
             loan.setFine(loan.getFine() + FIXED_FINE);

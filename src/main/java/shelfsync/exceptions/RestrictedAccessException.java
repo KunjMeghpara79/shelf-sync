@@ -1,7 +1,7 @@
 package shelfsync.exceptions;
 
 public class RestrictedAccessException extends RuntimeException{
-    private String message;
+    private final String message;
 
     public RestrictedAccessException(String message){this.message = message;}
 

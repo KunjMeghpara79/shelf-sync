@@ -37,7 +37,7 @@ public class BooksInitializer implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args){
         if (adminRepository.count() == 0) {
             Admin admin = new Admin();
             admin.setAdminEmail(adminEmail);

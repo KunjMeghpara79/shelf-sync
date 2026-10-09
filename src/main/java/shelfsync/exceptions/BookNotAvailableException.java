@@ -1,7 +1,7 @@
 package shelfsync.exceptions;
 
 public class BookNotAvailableException extends  RuntimeException {
-    private String message;
+    private final String message;
 
     public BookNotAvailableException(String message){this.message = message;}
 

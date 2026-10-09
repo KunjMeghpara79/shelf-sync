@@ -2,12 +2,10 @@ package shelfsync.repositories;
 
 import shelfsync.models.entities.BookData;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
 public interface BookDataRepository extends JpaRepository<BookData,Integer> {
-    public Optional<List<BookData>> findBybookNameContainingIgnoreCase(String bookName);
-    public Optional<List<BookData>> findByauthorNameContainingIgnoreCase(String authorName);
+    Optional<List<BookData>> findBybookNameContainingIgnoreCase(String bookName);
+    Optional<List<BookData>> findByauthorNameContainingIgnoreCase(String authorName);
 }

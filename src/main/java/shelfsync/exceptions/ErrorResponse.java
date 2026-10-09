@@ -1,13 +1,9 @@
 package shelfsync.exceptions;
 
-public class ErrorResponse {
-    public int getStatusCode() {
-        return statusCode;
-    }
+import lombok.Getter;
 
-    public String getMessage() {
-        return message;
-    }
+@Getter
+public class ErrorResponse {
 
     private int statusCode;
     private String message;

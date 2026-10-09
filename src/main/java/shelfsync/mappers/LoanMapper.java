@@ -6,5 +6,5 @@ import shelfsync.models.entities.Loan;
 
 @Mapper(componentModel = "spring")
 public interface LoanMapper {
-    public LoanResponseDto loanToLoanResponseDto(Loan loan);
+    LoanResponseDto loanToLoanResponseDto(Loan loan);
 }

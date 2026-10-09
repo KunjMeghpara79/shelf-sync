@@ -1,7 +1,7 @@
 package shelfsync.exceptions;
 
 public class InvalidFormatException extends RuntimeException{
-    private String message;
+    private final String message;
 
     public InvalidFormatException(String message){this.message = message;}
 

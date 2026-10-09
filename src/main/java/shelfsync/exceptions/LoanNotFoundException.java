@@ -1,7 +1,7 @@
 package shelfsync.exceptions;
 
 public class LoanNotFoundException extends RuntimeException{
-    private String message;
+    private final String message;
 
     public LoanNotFoundException(String message){this.message = message;}
 

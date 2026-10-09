@@ -37,7 +37,7 @@ public class WebSecurityConfigurationAdapter {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         // FIXED: Pass your custom service directly into the constructor instead of using a setter method
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider((UserDetailsService) customUserDetailsService);
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(customUserDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }

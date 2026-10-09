@@ -7,9 +7,9 @@ import shelfsync.models.dto.SearchRequestDto;
 import java.util.List;
 
 public interface MemberService {
-    public List<LoanResponseDto> getLoansReport();
-    public List<LoanResponseDto> getLoanHistory();
-    public List<BookDataResponseDto> getAvailableBooks();
-    public List<BookDataResponseDto> findByBookName(SearchRequestDto searchRequestDto);
-    public List<BookDataResponseDto> findByAuthorName(SearchRequestDto searchRequestDto);
+    List<LoanResponseDto> getLoansReport();
+    List<LoanResponseDto> getLoanHistory();
+    List<BookDataResponseDto> getAvailableBooks();
+    List<BookDataResponseDto> findByBookName(SearchRequestDto searchRequestDto);
+    List<BookDataResponseDto> findByAuthorName(SearchRequestDto searchRequestDto);
 }

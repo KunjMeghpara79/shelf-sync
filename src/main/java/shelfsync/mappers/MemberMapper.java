@@ -6,6 +6,6 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface MemberMapper {
-    public Member memberRequestDtoToMember(MemberRequestDto memberRequestDto);
-    public MemberResponseDto memberToMemberResponseDto(Member member);
+    Member memberRequestDtoToMember(MemberRequestDto memberRequestDto);
+    MemberResponseDto memberToMemberResponseDto(Member member);
 }

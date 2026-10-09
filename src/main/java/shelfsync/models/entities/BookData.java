@@ -25,10 +25,6 @@ public class BookData {
     @Column(name = "author")
     private String authorName;
 
-
-//    @Column(name = "available_quantity")
-//    private int availableQuantity;
-
     @OneToMany(mappedBy = "bookData", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Book> books;
 

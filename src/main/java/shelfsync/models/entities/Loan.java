@@ -8,7 +8,6 @@ import lombok.Setter;
 import shelfsync.enums.LoanStatus;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -45,11 +44,4 @@ public class Loan {
     @Column(name = "return_date")
     private LocalDateTime returnDate;
 
-
-
-
-
-//    @JoinColumn(name = "book_data_id")
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    private BookData bookData;
 }

@@ -17,7 +17,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import shelfsync.exceptions.MemberNotFoundException;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -75,15 +74,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "JWT has expired");
             objectMapper.writeValue(response.getWriter(),errorResponse);
             return;
-        }
-        catch (SignatureException e) {
+        }catch (MalformedJwtException ex){
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType("application/json");
             ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "JWT is tampered");
             objectMapper.writeValue(response.getWriter(), errorResponse);
             return;
         }
-        catch (MalformedJwtException ex){
+        catch (SignatureException e) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType("application/json");
             ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "JWT is tampered");

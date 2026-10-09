@@ -1,7 +1,7 @@
 package shelfsync.exceptions;
 
 public class MemberAlreadyExistsException extends RuntimeException{
-    private String message;
+    private final String message;
 
     public MemberAlreadyExistsException(String message){this.message = message;}
 

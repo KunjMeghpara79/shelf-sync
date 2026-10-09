@@ -8,8 +8,8 @@ import shelfsync.models.entities.BookData;
 @Mapper(componentModel = "spring")
 public interface BookDataMapper {
 
-    public BookData bookDataRequestDtoToBookData(BookDataRequestDto bookDataRequestDto);
+    BookData bookDataRequestDtoToBookData(BookDataRequestDto bookDataRequestDto);
 
-    public BookDataResponseDto bookDatatoBookDataResponseDto(BookData bookData);
+    BookDataResponseDto bookDatatoBookDataResponseDto(BookData bookData);
 
 }

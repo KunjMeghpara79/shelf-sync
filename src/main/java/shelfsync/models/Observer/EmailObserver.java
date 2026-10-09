@@ -6,7 +6,7 @@ import shelfsync.services.interfaces.EmailService;
 
 public class EmailObserver implements MemberObserver {
 
-    private EmailService emailService;
+    private final EmailService emailService;
 
     public EmailObserver(EmailService emailService) {
         this.emailService = emailService;

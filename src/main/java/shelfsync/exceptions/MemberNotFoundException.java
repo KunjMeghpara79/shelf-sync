@@ -2,7 +2,7 @@ package shelfsync.exceptions;
 
 public class MemberNotFoundException extends RuntimeException{
 
-    private String message;
+    private final String message;
 
     public MemberNotFoundException(String message){this.message = message;}
 

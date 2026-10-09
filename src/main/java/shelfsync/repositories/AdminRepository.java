@@ -6,5 +6,5 @@ import shelfsync.models.entities.Admin;
 import java.util.Optional;
 
 public interface AdminRepository extends JpaRepository<Admin,Integer> {
-    public Optional<Admin> findByAdminEmail(String email);
+    Optional<Admin> findByAdminEmail(String email);
 }

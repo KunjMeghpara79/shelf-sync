@@ -11,8 +11,8 @@ public class DuplicateCopyHandler implements BorrowHandler{
 
     @Override
     public void check(Request request) {
-        if(request.getMember().getLoans().stream()
-                .anyMatch(l -> l.getBook().getBookName().equals(request.getBookData().getBookName()))){
+        if(request.member().getLoans().stream()
+                .anyMatch(l -> l.getBook().getBookName().equals(request.bookData().getBookName()))){
             throw new BookAlreadyBorrowedException("This member has already borrowed one copy of this book");
         }
         else next.check(request);

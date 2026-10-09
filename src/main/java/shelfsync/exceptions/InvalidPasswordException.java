@@ -1,7 +1,7 @@
 package shelfsync.exceptions;
 
 public class InvalidPasswordException extends RuntimeException{
-    private String message;
+    private final String message;
 
     public InvalidPasswordException(String message){this.message = message;}
 
