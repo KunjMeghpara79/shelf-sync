@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -143,6 +144,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
     public MemberResponseDto collectFine(int bookId, int fineAmount){
         if(bookId <=0) throw new InvalidFormatException("Book id can not be zero or negative !");
         if(fineAmount <=0 )throw new FinePayException("Amount can not be zero or negative");
@@ -153,7 +155,7 @@ public class AdminServiceImpl implements AdminService {
         if(member.getFine() <= 0) throw new FinePayException("Member have no fine to pay!");
         if(member.getFine() < fineAmount) throw new FinePayException("fine amount is exceeding the total fine!");
         int sum = 0;
-        Set<Loan> loans = member.getLoans();
+        Set<Loan> loans = member.getLoans().stream().filter(l -> l.getLoanStatus() == LoanStatus.DUE).collect(Collectors.toSet());
         for (Loan loan : loans){
             sum += loan.getFine();
         }
@@ -166,16 +168,15 @@ public class AdminServiceImpl implements AdminService {
             if(member.getMemberStatus() == MemberStatus.RESTRICTED) member.setMemberStatus(MemberStatus.ACTIVE);
         }
         else {
-            if (member.getLoans().stream().anyMatch(l -> l.getLoanStatus() == LoanStatus.DUE)) {
-                throw new RestrictedAccessException("You have to complete all late book returns first then you can pay fine !");
-            }
-            Loan loan = member.getLoans().stream().filter(l -> l.getFine() == fineAmount).findFirst().orElseThrow(() -> new LoanNotFoundException("No loan found of " + fineAmount + " Rs !"));
+            Loan loan = book.getLoan();
+            if (book.getLoan() == null)
+                throw new LoanNotFoundException("No loan found for this book!");
             loan.setLoanStatus(LoanStatus.PAID);
             book.setLoan(null);
             member.setFine(member.getFine() - fineAmount);
             if (member.getFine() < fineThreshold) member.setMemberStatus(MemberStatus.ACTIVE);
-            memberRepository.save(member);
         }
+        memberRepository.save(member);
         return memberMapper.memberToMemberResponseDto(member);
     }
 
