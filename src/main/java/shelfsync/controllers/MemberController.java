@@ -1,5 +1,6 @@
 package shelfsync.controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class MemberController {
     }
 
     @PostMapping("/find-by-name")
-    public ResponseEntity<List<BookDataResponseDto>> findBookByBookName(@RequestBody SearchRequestDto searchRequestDto){
+    public ResponseEntity<List<BookDataResponseDto>> findBookByBookName(@Valid @RequestBody SearchRequestDto searchRequestDto){
         List<BookDataResponseDto> bookData = memberService.findByBookName(searchRequestDto);
         return new ResponseEntity<>(bookData,HttpStatus.OK);
     }
