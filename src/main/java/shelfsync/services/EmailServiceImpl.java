@@ -20,21 +20,14 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public String sendSimpleMail(EmailDetails details) {
         try {
-
             MimeMessage message = javaMailSender.createMimeMessage();
-
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
-
             helper.setFrom(sender);
             helper.setTo(details.getRecipient());
             helper.setSubject(details.getSubject());
-
             helper.setText(details.getMsgBody(), true);
-
             javaMailSender.send(message);
-
             return "Mail Sent Successfully";
-
         } catch (Exception e) {
             e.printStackTrace();
             return "Error while sending mail: " + e.getMessage();
