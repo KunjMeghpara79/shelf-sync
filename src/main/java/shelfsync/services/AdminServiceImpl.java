@@ -61,17 +61,14 @@ public class AdminServiceImpl implements AdminService {
         Optional<Member> member = memberRepository.findById(memberId);
         if(member.isEmpty()) throw new MemberNotFoundException("Member not found !");
         Request request = new Request(book.get(),bookData,member.get());
-
         AlreadyBorrowedHandler alreadyBorrowedHandler = new AlreadyBorrowedHandler();
         RestrictedMemberHandler restrictedMemberHandler = new RestrictedMemberHandler();
         DuplicateCopyHandler duplicateCopyHandler = new DuplicateCopyHandler();
         QuantityHandler quantityHandler = new QuantityHandler();
-
         alreadyBorrowedHandler.setNext(restrictedMemberHandler);
         restrictedMemberHandler.setNext(duplicateCopyHandler);
         duplicateCopyHandler.setNext(quantityHandler);
         alreadyBorrowedHandler.check(request);
-
         Loan loan = new Loan();
         loan.setMember(member.get());
         loan.setBook(book.get());
@@ -89,10 +86,8 @@ public class AdminServiceImpl implements AdminService {
     public LoanResponseDto collectBook(int id){
         if(id <=0) throw new InvalidFormatException("Book id can not be zero or negative !");
         Book book = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found !"));
-
         if(book.getLoan() == null) throw new LoanNotFoundException("No loan found for this book !");
         Member member = book.getLoan().getMember();
-
         Loan loan = member.getLoans().stream()
                 .filter(l -> l.getBook().getBookId() == book.getBookId()).findFirst().orElseThrow(() -> new LoanNotFoundException("Loan not found!"));
         LocalDateTime returnTime = LocalDateTime.now(ZoneId.of("UTC"));
@@ -123,7 +118,6 @@ public class AdminServiceImpl implements AdminService {
                     LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(l);
                     return loanResponseDto.withBookName(l.getMember().getMemberName(),l.getBook().getBookName());
                 }).toList();
-
     }
 
     @Override
