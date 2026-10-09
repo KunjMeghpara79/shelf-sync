@@ -120,7 +120,7 @@ public class GlobalExceptionHandler {
                 String errorMessage = e.getBindingResult()
                         .getFieldErrors()
                         .stream()
-                        .map(FieldError::getDefaultMessage)
+                        .map(error -> error.getDefaultMessage())
                         .collect(Collectors.joining(", "));
 
                 yield new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Validation Failed: " + errorMessage);
