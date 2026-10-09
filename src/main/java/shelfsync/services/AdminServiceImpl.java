@@ -21,6 +21,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -87,6 +88,9 @@ public class AdminServiceImpl implements AdminService {
         if(id <=0) throw new InvalidFormatException("Book id can not be zero or negative !");
         Book book = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found !"));
         if(book.getLoan() == null) throw new LoanNotFoundException("No loan found for this book !");
+        if(LocalDateTime.now(ZoneId.of("UTC")).isAfter(book.getLoan().getDueDate())){
+            throw new RestrictedAccessException("The loan is expired return the book with fine !");
+        }
         Member member = book.getLoan().getMember();
         Loan loan = member.getLoans().stream()
                 .filter(l -> l.getBook().getBookId() == book.getBookId()).findFirst().orElseThrow(() -> new LoanNotFoundException("Loan not found!"));
@@ -139,18 +143,39 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public MemberResponseDto collectFine(int memberId, int fineAmount){
-        if(memberId <=0) throw new InvalidFormatException("Member id can not be zero or negative !");
+    public MemberResponseDto collectFine(int bookId, int fineAmount){
+        if(bookId <=0) throw new InvalidFormatException("Book id can not be zero or negative !");
         if(fineAmount <=0 )throw new FinePayException("Amount can not be zero or negative");
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException("Book not found !"));
+        if(book.getLoan() == null) throw new LoanNotFoundException("No loan found for this book !");
+        if(book.getLoan().getLoanStatus() == LoanStatus.PAID || book.getLoan().getFine() <= 0) throw new LoanNotFoundException("There is no fine on this book or fine on this loan is already paid");
+        Member member = book.getLoan().getMember();
         if(member.getFine() <= 0) throw new FinePayException("Member have no fine to pay!");
         if(member.getFine() < fineAmount) throw new FinePayException("fine amount is exceeding the total fine!");
-        if(member.getLoans().stream().anyMatch(l -> l.getLoanStatus() == LoanStatus.DUE)){throw new RestrictedAccessException("You have to complete all late book returns first then you can pay fine !");}
-        Loan loan = member.getLoans().stream().filter(l -> l.getFine() == fineAmount).findFirst().orElseThrow(() -> new LoanNotFoundException("No loan found of " + fineAmount + " Rs !"));
-        loan.setFine(0);
-        member.setFine(member.getFine() - fineAmount);
-        if(member.getFine() < fineThreshold) member.setMemberStatus(MemberStatus.ACTIVE);
-        memberRepository.save(member);
+        int sum = 0;
+        Set<Loan> loans = member.getLoans();
+        for (Loan loan : loans){
+            sum += loan.getFine();
+        }
+        if(sum == member.getFine()){
+            for (Loan loan : loans){
+                loan.setLoanStatus(LoanStatus.PAID);
+                loan.getBook().setLoan(null);
+            }
+            member.setFine(0);
+            if(member.getMemberStatus() == MemberStatus.RESTRICTED) member.setMemberStatus(MemberStatus.ACTIVE);
+        }
+        else {
+            if (member.getLoans().stream().anyMatch(l -> l.getLoanStatus() == LoanStatus.DUE)) {
+                throw new RestrictedAccessException("You have to complete all late book returns first then you can pay fine !");
+            }
+            Loan loan = member.getLoans().stream().filter(l -> l.getFine() == fineAmount).findFirst().orElseThrow(() -> new LoanNotFoundException("No loan found of " + fineAmount + " Rs !"));
+            loan.setLoanStatus(LoanStatus.PAID);
+            book.setLoan(null);
+            member.setFine(member.getFine() - fineAmount);
+            if (member.getFine() < fineThreshold) member.setMemberStatus(MemberStatus.ACTIVE);
+            memberRepository.save(member);
+        }
         return memberMapper.memberToMemberResponseDto(member);
     }
 
