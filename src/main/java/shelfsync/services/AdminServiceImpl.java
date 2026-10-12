@@ -167,6 +167,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
     public MemberResponseDto collectFine(int bookId, int fineAmount){
         if(bookId <=0) throw new InvalidFormatException("Book id can not be zero or negative !");
         if(fineAmount <=0 )throw new FinePayException("Amount can not be zero or negative");
