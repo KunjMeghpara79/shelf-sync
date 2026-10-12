@@ -43,10 +43,10 @@ public class LoanScheduler {
     public void addFines(){
         List<Loan> loans = loanRepository.findByLoanStatusIn(List.of(LoanStatus.DUE));
         for(Loan loan : loans){
-            loan.setFine(loan.getFine() + FIXED_FINE);
-            log.info(String.valueOf(loan.getFine()));
             Member member = loan.getMember();
+            loan.setFine(loan.getFine() + FIXED_FINE);
             member.setFine(member.getFine() + FIXED_FINE);
+            log.info(String.valueOf(loan.getFine()));
         }
     }
 }

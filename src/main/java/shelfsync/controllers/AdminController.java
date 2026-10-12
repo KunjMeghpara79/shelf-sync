@@ -1,5 +1,6 @@
 package shelfsync.controllers;
 
+import ch.qos.logback.core.pattern.util.RegularEscapeUtil;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,9 +56,9 @@ public class AdminController {
         return new ResponseEntity<>(memberResponseDto, HttpStatus.OK);
     }
 
-    @PutMapping("/{memberId}/{fineAmount}")
-    public ResponseEntity<MemberResponseDto> finePay(@PathVariable int memberId, @PathVariable int fineAmount) {
-        MemberResponseDto memberResponseDto = adminService.collectFine(memberId, fineAmount);
+    @PutMapping("/fine/{bookId}/{fineAmount}")
+    public ResponseEntity<MemberResponseDto> finePay(@PathVariable int bookId, @PathVariable int fineAmount) {
+        MemberResponseDto memberResponseDto = adminService.collectFine(bookId, fineAmount);
         return new ResponseEntity<>(memberResponseDto, HttpStatus.OK);
     }
 
@@ -65,6 +66,12 @@ public class AdminController {
     public ResponseEntity<BookDataResponseDto> addBook(@RequestBody @Valid BookDataRequestDto bookDataRequestDto) {
         BookDataResponseDto bookDataResponseDto = adminService.addBook(bookDataRequestDto);
         return new ResponseEntity<>(bookDataResponseDto, HttpStatus.OK);
+    }
+
+    @PutMapping("/fine/collect-total/{memberId}/{fineAmount}")
+    public ResponseEntity<MemberResponseDto> collectTotalFine(@PathVariable int memberId,@PathVariable int fineAmount){
+        MemberResponseDto memberResponseDto = adminService.collectTotalFine(memberId,fineAmount);
+        return new ResponseEntity<>(memberResponseDto,HttpStatus.OK);
     }
 
 }
