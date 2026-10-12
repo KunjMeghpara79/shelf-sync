@@ -41,6 +41,8 @@ public class AdminServiceImpl implements AdminService {
     private final BookRepository bookRepository;
     @Value("${member.fine.threshold}")
     private int fineThreshold;
+    @Value("${member.borrow.threshold}")
+    private int borrowingThreshold;
     public AdminServiceImpl(AdminRepository adminRepository, PasswordEncoder passwordEncoder, JwtService jwtService, LoanRepository loanRepository, LoanMapper loanMapper, MemberMapper memberMapper, MemberRepository memberRepository, BookDataRepository bookDataRepository, BookDataMapper bookDataMapper, BookRepository bookRepository) {
         this.adminRepository = adminRepository;
         this.passwordEncoder = passwordEncoder;
@@ -64,6 +66,9 @@ public class AdminServiceImpl implements AdminService {
         BookData bookData = book.get().getBookData();
         Optional<Member> member = memberRepository.findById(memberId);
         if(member.isEmpty()) throw new MemberNotFoundException("Member not found !");
+        if(member.get().getLoans().stream().filter(l -> l.getLoanStatus() == LoanStatus.PENDING || l.getLoanStatus() == DUE).toList().size() >= borrowingThreshold){
+            throw new RestrictedAccessException("This member has exceeded the borrowing limit !");
+        }
         Request request = new Request(book.get(),bookData,member.get());
         AlreadyBorrowedHandler alreadyBorrowedHandler = new AlreadyBorrowedHandler();
         RestrictedMemberHandler restrictedMemberHandler = new RestrictedMemberHandler();
