@@ -38,7 +38,7 @@ public class LoanScheduler {
         loanRepository.saveAll(loans);
     }
 
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 3600000)
     @Transactional
     public void addFines(){
         List<Loan> loans = loanRepository.findByLoanStatusIn(List.of(LoanStatus.DUE));
