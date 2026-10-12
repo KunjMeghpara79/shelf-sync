@@ -2,6 +2,7 @@ package shelfsync.services;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import shelfsync.borrowchain.*;
@@ -22,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import static shelfsync.enums.LoanStatus.DUE;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -73,7 +76,7 @@ public class AdminServiceImpl implements AdminService {
         Loan loan = new Loan();
         loan.setMember(member.get());
         loan.setBook(book.get());
-        loan.setDueDate(loan.getIssueDate().plusDays(5));
+        loan.setDueDate(loan.getIssueDate().plusSeconds(10));
         book.get().setLoan(loan);
         bookData.getLoans().add(loan);
         member.get().getLoans().add(loan);
@@ -106,8 +109,18 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
     public MemberResponseDto collectTotalFine(int memberId, int fineAmount) {
-        return null;
+        if(fineAmount <=0 )throw new FinePayException("Fine amount can not be zero or negative");
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("Member not found !"));
+        if(member.getFine() == fineAmount){
+            for(Loan loan : member.getLoans().stream().filter(l -> l.getLoanStatus() == DUE).toList()){
+                loan.setReturnDate(LocalDateTime.now(ZoneId.of("UTC")));
+                loan.setLoanStatus(LoanStatus.PAID);
+            }
+            member.setFine(0);
+        }else throw new FinePayException("Total fine for the member is not equal to fine amount !");
+        return memberMapper.memberToMemberResponseDto(member);
     }
 
     @Override
@@ -122,7 +135,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<LoanResponseDto> getLoansReport(){
-        List<Loan> loans = loanRepository.findByLoanStatusIn(List.of(LoanStatus.DUE,LoanStatus.PENDING));
+        List<Loan> loans = loanRepository.findByLoanStatusIn(List.of(DUE,LoanStatus.PENDING));
         return loans.stream()
                 .map(l ->{
                     LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(l);
@@ -158,7 +171,7 @@ public class AdminServiceImpl implements AdminService {
         Member member = book.getLoan().getMember();
         if(member.getFine() <= 0) throw new FinePayException("Member have no fine to pay!");
         if(member.getFine() < fineAmount) throw new FinePayException("fine amount is exceeding the total fine!");
-        if (member.getLoans().stream().anyMatch(l -> l.getLoanStatus() == LoanStatus.DUE)) {
+        if (member.getLoans().stream().anyMatch(l -> l.getLoanStatus() == DUE)) {
             throw new RestrictedAccessException("You have to complete all late book returns first then you can pay fine !");
         }
         Loan loan = member.getLoans().stream().filter(l -> l.getFine() == fineAmount).findFirst().orElseThrow(() -> new LoanNotFoundException("No loan found of " + fineAmount + " Rs !"));
