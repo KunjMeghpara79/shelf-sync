@@ -83,8 +83,6 @@ public class AdminServiceImpl implements AdminService {
         return loanResponseDto;
     }
 
-
-
     @Override
     @Transactional
     public LoanResponseDto collectBook(int id){
@@ -107,24 +105,6 @@ public class AdminServiceImpl implements AdminService {
         loanResponseDto = loanResponseDto.withBookName(member.getMemberName(),loan.getBook().getBookName());
         return loanResponseDto;
     }
-
-    @Override
-    @Transactional
-    public MemberResponseDto collectTotalFine(int memberId, int fineAmount) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("Member not found !"));
-        if(member.getFine() == fineAmount){
-            member.setFine(0);
-            for(Loan loan : member.getLoans()){
-                Book book = loan.getBook();
-                book.setLoan(null);
-                loan.setLoanStatus(LoanStatus.PAID);
-            }
-            if(member.getMemberStatus() == MemberStatus.RESTRICTED) member.setMemberStatus(MemberStatus.ACTIVE);
-        }else throw new FinePayException("Fine amount is not equal to total fine !");
-        return memberMapper.memberToMemberResponseDto(member);
-
-    }
-
     @Override
     public JwtResponseDto loginValidation(AdminLoginRequestDto adminLoginRequestDto){
         Admin admin = adminRepository.findByAdminEmail(adminLoginRequestDto.adminEmail()).orElseThrow(() -> new MemberNotFoundException("Admin not found!"));
@@ -174,12 +154,29 @@ public class AdminServiceImpl implements AdminService {
         Member member = book.getLoan().getMember();
         if(member.getFine() <= 0) throw new FinePayException("Member have no fine to pay!");
         if(member.getFine() < fineAmount) throw new FinePayException("fine amount is exceeding the total fine!");
-        Loan loan = book.getLoan();
-        loan.setReturnDate(LocalDateTime.now(ZoneId.of("UTC")));
-        loan.setLoanStatus(LoanStatus.PAID);
-        book.setLoan(null);
-        member.setFine(member.getFine() - fineAmount);
-        if (member.getFine() < fineThreshold) member.setMemberStatus(MemberStatus.ACTIVE);
+        int sum = 0;
+        Set<Loan> loans = member.getLoans().stream().filter(l -> l.getLoanStatus() == LoanStatus.DUE).collect(Collectors.toSet());
+        for (Loan loan : loans){
+            sum += loan.getFine();
+        }
+        if(sum == member.getFine()){
+            for (Loan loan : loans){
+                loan.setLoanStatus(LoanStatus.PAID);
+                loan.getBook().setLoan(null);
+            }
+            member.setFine(0);
+            if(member.getMemberStatus() == MemberStatus.RESTRICTED) member.setMemberStatus(MemberStatus.ACTIVE);
+        }
+        else {
+            Loan loan = book.getLoan();
+            if (book.getLoan() == null)
+                throw new LoanNotFoundException("No loan found for this book!");
+            loan.setLoanStatus(LoanStatus.PAID);
+            book.setLoan(null);
+            member.setFine(member.getFine() - fineAmount);
+            if (member.getFine() < fineThreshold) member.setMemberStatus(MemberStatus.ACTIVE);
+        }
+        memberRepository.save(member);
         return memberMapper.memberToMemberResponseDto(member);
     }
 
