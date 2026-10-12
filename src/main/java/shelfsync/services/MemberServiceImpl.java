@@ -56,14 +56,11 @@ public class MemberServiceImpl implements MemberService{
     public List<LoanResponseDto> getLoansReport(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Member member = memberRepository.findByMemberEmail(email).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
-
         List<Loan> loans = loanRepository.findByLoanStatusInAndMember(List.of(LoanStatus.DUE,LoanStatus.PENDING),member);
-
         return loans.stream()
                 .map(l -> {
                     LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(l);
                    return loanResponseDto.withBookName(member.getMemberName(),l.getBook().getBookName());
-
                 }).toList();
     }
 
