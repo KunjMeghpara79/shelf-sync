@@ -36,8 +36,7 @@ public class LoanScheduler {
             <p>Hello <strong>%s</strong>,</p>
 
             <p>
-                This is a reminder that the book you borrowed from
-                <strong>ShelfSync</strong> has reached its due date.
+                This is a reminder that the book you borrowed has reached its due date.
             </p>
 
             <p>
