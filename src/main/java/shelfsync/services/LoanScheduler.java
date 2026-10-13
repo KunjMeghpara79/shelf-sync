@@ -69,6 +69,7 @@ public class LoanScheduler {
                         now,
                         LoanStatus.PENDING
                 );
+        if(loans.isEmpty()) return;
         for (Loan loan : loans) {
             loan.setLoanStatus(LoanStatus.DUE);
             String emailMessage = message.formatted(
