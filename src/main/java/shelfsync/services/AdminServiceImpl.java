@@ -17,6 +17,8 @@ import shelfsync.models.entities.*;
 import shelfsync.repositories.*;
 import shelfsync.security.JwtService;
 import shelfsync.services.interfaces.AdminService;
+import shelfsync.services.interfaces.EmailService;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -39,11 +41,36 @@ public class AdminServiceImpl implements AdminService {
     private final BookDataRepository bookDataRepository;
     private final BookDataMapper bookDataMapper;
     private final BookRepository bookRepository;
+    private final EmailService emailService;
     @Value("${member.fine.threshold}")
     private int fineThreshold;
     @Value("${member.borrow.threshold}")
     private int borrowingThreshold;
-    public AdminServiceImpl(AdminRepository adminRepository, PasswordEncoder passwordEncoder, JwtService jwtService, LoanRepository loanRepository, LoanMapper loanMapper, MemberMapper memberMapper, MemberRepository memberRepository, BookDataRepository bookDataRepository, BookDataMapper bookDataMapper, BookRepository bookRepository) {
+    private String message = """
+        <html>
+        <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+            <h2 style="color: #2e7d32;">Book Borrowing Confirmation</h2>
+
+            <p>Hello <strong>%s</strong>,</p>
+
+            <p>Your book has been issued successfully!</p>
+
+            <p>
+                <strong>Book Name:</strong> %s
+            </p>
+
+            <p>Please make sure to return the book before the due date.</p>
+
+            <p>Happy Reading!</p>
+
+            <p>
+                Regards,<br>
+                <strong>Team ShelfSync</strong>
+            </p>
+        </body>
+        </html>
+        """;
+    public AdminServiceImpl(AdminRepository adminRepository, PasswordEncoder passwordEncoder, JwtService jwtService, LoanRepository loanRepository, LoanMapper loanMapper, MemberMapper memberMapper, MemberRepository memberRepository, BookDataRepository bookDataRepository, BookDataMapper bookDataMapper, BookRepository bookRepository, EmailService emailService) {
         this.adminRepository = adminRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
@@ -54,8 +81,12 @@ public class AdminServiceImpl implements AdminService {
         this.bookDataRepository = bookDataRepository;
         this.bookDataMapper = bookDataMapper;
         this.bookRepository = bookRepository;
+        this.emailService = emailService;
     }
 
+    private void sendEmail(EmailDetails emailDetails){
+        emailService.sendSimpleMail(emailDetails);
+    }
     @Override
     @Transactional
     public LoanResponseDto issueBook(int bookId, int memberId){
@@ -87,6 +118,18 @@ public class AdminServiceImpl implements AdminService {
         member.get().getLoans().add(loan);
         LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(loan);
         loanResponseDto = loanResponseDto.withBookName(member.get().getMemberName(),loan.getBook().getBookName());
+        String emailMessage = message.formatted(
+                member.get().getMemberName(),
+                bookData.getBookName()
+        );
+
+        EmailDetails emailDetails = new EmailDetails(
+                member.get().getMemberEmail(),
+                emailMessage,
+                "Book Borrowing Confirmation",
+                null
+        );
+        sendEmail(emailDetails);
         return loanResponseDto;
     }
 
