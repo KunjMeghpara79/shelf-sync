@@ -24,11 +24,13 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleConflictExceptions(ConflictException ex){
         return new ErrorResponse(HttpStatus.CONFLICT.value(),ex.getMessage());
     }
+
     @ExceptionHandler({ForbiddenException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorResponse handleForbiddenExceptions(ForbiddenException ex){
         return new ErrorResponse(HttpStatus.FORBIDDEN.value(),ex.getMessage());
     }
+
     @ExceptionHandler({UnauthorizedException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponse handleUnauthorizedExceptions(UnauthorizedException ex){

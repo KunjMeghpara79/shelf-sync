@@ -6,8 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shelfsync.models.dto.*;
 import shelfsync.services.interfaces.MemberService;
-
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
