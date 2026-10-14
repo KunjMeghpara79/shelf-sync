@@ -1,7 +1,8 @@
 package shelfsync.services;
-import shelfsync.exceptions.InvalidPasswordException;
-import shelfsync.exceptions.MemberAlreadyExistsException;
-import shelfsync.exceptions.MemberNotFoundException;
+import shelfsync.exceptions.ConflictException;
+import shelfsync.exceptions.ForbiddenException;
+import shelfsync.exceptions.NotFoundException;
+import shelfsync.exceptions.UnauthorizedException;
 import shelfsync.mappers.MemberMapper;
 import shelfsync.models.dto.JwtResponseDto;
 import shelfsync.models.dto.LoginRequestDto;
@@ -29,7 +30,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public MemberResponseDto registerMember(MemberRequestDto memberRequestDto){
-        if(memberRepository.existsByMemberEmail(memberRequestDto.memberEmail())) throw new MemberAlreadyExistsException("Member Already exists!");
+        if(memberRepository.existsByMemberEmail(memberRequestDto.memberEmail())) throw new ConflictException("Member Already exists!");
         Member member = memberMapper.memberRequestDtoToMember(memberRequestDto);
         member.setPassword(passwordEncoder.encode(memberRequestDto.password()));
         memberRepository.save(member);
@@ -38,9 +39,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public JwtResponseDto loginValidation(LoginRequestDto loginRequestDto) {
-        Member member = memberRepository.findByMemberEmail(loginRequestDto.email()).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
+        Member member = memberRepository.findByMemberEmail(loginRequestDto.email()).orElseThrow(() -> new NotFoundException("Member not found!"));
         if (!passwordEncoder.matches(loginRequestDto.password(),member.getPassword())) {
-            throw new InvalidPasswordException("Invalid password!");
+            throw new UnauthorizedException("Invalid password!");
         }
         String token = jwtService.generateToken(loginRequestDto.email(),"MEMBER");
         return new JwtResponseDto(token);

@@ -41,7 +41,7 @@ public class AdminController {
     @PostMapping("/issue-book/{bookId}/{memberId}")
     public ResponseEntity<LoanResponseDto> borrowBook(@PathVariable int bookId, @PathVariable int memberId) {
         LoanResponseDto loanResponseDto = adminService.issueBook(bookId, memberId);
-        return new ResponseEntity<>(loanResponseDto, HttpStatus.OK);
+        return new ResponseEntity<>(loanResponseDto, HttpStatus.CREATED);
     }
 
     @PostMapping("/accept-book/{bookId}")
@@ -65,7 +65,7 @@ public class AdminController {
     @PostMapping("/book")
     public ResponseEntity<BookDataResponseDto> addBook(@RequestBody @Valid BookDataRequestDto bookDataRequestDto) {
         BookDataResponseDto bookDataResponseDto = adminService.addBook(bookDataRequestDto);
-        return new ResponseEntity<>(bookDataResponseDto, HttpStatus.OK);
+        return new ResponseEntity<>(bookDataResponseDto, HttpStatus.CREATED);
     }
 
     @PutMapping("/fine/collect-total/{memberId}/{fineAmount}")

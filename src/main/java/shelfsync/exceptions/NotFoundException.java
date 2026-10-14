@@ -1,9 +1,9 @@
 package shelfsync.exceptions;
 
-public class BookNotAvailableException extends  RuntimeException {
+public class NotFoundException extends RuntimeException{
     private final String message;
 
-    public BookNotAvailableException(String message){this.message = message;}
+    public NotFoundException(String message){this.message = message;}
 
     @Override
     public String getMessage() {

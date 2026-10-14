@@ -94,12 +94,12 @@ public class AdminServiceImpl implements AdminService {
         if(bookId <=0) throw new InvalidFormatException("book id can not be zero or negative !");
         if(memberId <=0)throw new InvalidFormatException("Member id can not be zero or negative !");
         Optional<Book> book = bookRepository.findById(bookId);
-        if(book.isEmpty()) throw new BookNotFoundException("Book not found !");
+        if(book.isEmpty()) throw new NotFoundException("Book not found !");
         BookData bookData = book.get().getBookData();
         Optional<Member> member = memberRepository.findById(memberId);
-        if(member.isEmpty()) throw new MemberNotFoundException("Member not found !");
+        if(member.isEmpty()) throw new NotFoundException("Member not found !");
         if(member.get().getLoans().stream().filter(l -> l.getLoanStatus() == LoanStatus.PENDING || l.getLoanStatus() == DUE).toList().size() >= borrowingThreshold){
-            throw new RestrictedAccessException("This member has exceeded the borrowing limit !");
+            throw new ForbiddenException("This member has exceeded the borrowing limit !");
         }
         Request request = new Request(book.get(),bookData,member.get());
         AlreadyBorrowedHandler alreadyBorrowedHandler = new AlreadyBorrowedHandler();
@@ -138,14 +138,14 @@ public class AdminServiceImpl implements AdminService {
     @Transactional
     public LoanResponseDto collectBook(int id){
         if(id <=0) throw new InvalidFormatException("Book id can not be zero or negative !");
-        Book book = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found !"));
-        if(book.getLoan() == null) throw new LoanNotFoundException("No loan found for this book !");
+        Book book = bookRepository.findById(id).orElseThrow(() -> new NotFoundException("Book not found !"));
+        if(book.getLoan() == null) throw new NotFoundException("No loan found for this book !");
         if(LocalDateTime.now(ZoneId.of("UTC")).isAfter(book.getLoan().getDueDate())){
-            throw new RestrictedAccessException("The loan is expired return the book with fine !");
+            throw new ForbiddenException("The loan is expired return the book with fine !");
         }
         Member member = book.getLoan().getMember();
         Loan loan = member.getLoans().stream()
-                .filter(l -> l.getBook().getBookId() == book.getBookId()).findFirst().orElseThrow(() -> new LoanNotFoundException("Loan not found!"));
+                .filter(l -> l.getBook().getBookId() == book.getBookId()).findFirst().orElseThrow(() -> new NotFoundException("Loan not found!"));
         LocalDateTime returnTime = LocalDateTime.now(ZoneId.of("UTC"));
         loan.setLoanStatus(LoanStatus.PAID);
         loan.setReturnDate(returnTime);
@@ -160,15 +160,15 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional
     public MemberResponseDto collectTotalFine(int memberId, int fineAmount) {
-        if(fineAmount <=0 )throw new FinePayException("Fine amount can not be zero or negative");
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("Member not found !"));
+        if(fineAmount <=0 )throw new InvalidFormatException("Fine amount can not be zero or negative");
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException("Member not found !"));
         if(member.getFine() == fineAmount){
             for(Loan loan : member.getLoans().stream().filter(l -> l.getLoanStatus() == DUE).toList()){
                 loan.setReturnDate(LocalDateTime.now(ZoneId.of("UTC")));
                 loan.setLoanStatus(LoanStatus.PAID);
             }
             member.setFine(0);
-        }else throw new FinePayException("Total fine for the member is not equal to fine amount !");
+        }else throw new ForbiddenException("Total fine for the member is not equal to fine amount !");
         return memberMapper.memberToMemberResponseDto(member);
     }
 
@@ -176,12 +176,12 @@ public class AdminServiceImpl implements AdminService {
     @Transactional
     public LoanResponseDto renewLoan(int bookId) {
         if(bookId <=0 )throw new InvalidFormatException("Book id can not be zero or negative");
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException("Book not found !"));
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new NotFoundException("Book not found !"));
         Loan loan = book.getLoan();
-        if(loan == null) throw new LoanNotFoundException("No loan found for the book "+ book.getBookName());
+        if(loan == null) throw new NotFoundException("No loan found for the book "+ book.getBookName());
         long diff = ChronoUnit.DAYS.between(loan.getIssueDate(), loan.getDueDate());
-        if(loan.getLoanStatus() == DUE || loan.getLoanStatus() == LoanStatus.PAID) throw new RestrictedAccessException("Only pending loans can be renewed");
-        if(diff > 5) throw new RestrictedAccessException("The book can be renewed only once !");
+        if(loan.getLoanStatus() == DUE || loan.getLoanStatus() == LoanStatus.PAID) throw new ForbiddenException("Only pending loans can be renewed");
+        if(diff > 5) throw new ForbiddenException("The book can be renewed only once !");
         else{
             loan.setDueDate(loan.getDueDate().plusDays(5));
         }
@@ -190,9 +190,9 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public JwtResponseDto loginValidation(AdminLoginRequestDto adminLoginRequestDto){
-        Admin admin = adminRepository.findByAdminEmail(adminLoginRequestDto.adminEmail()).orElseThrow(() -> new MemberNotFoundException("Admin not found!"));
+        Admin admin = adminRepository.findByAdminEmail(adminLoginRequestDto.adminEmail()).orElseThrow(() -> new NotFoundException("Admin not found!"));
         if (!passwordEncoder.matches(adminLoginRequestDto.password(),admin.getPassword())) {
-            throw new InvalidPasswordException("Invalid password!");
+            throw new ForbiddenException("Invalid password!");
         }
         String token = jwtService.generateToken(admin.getAdminEmail(),"ADMIN");
         return new JwtResponseDto(token);
@@ -211,7 +211,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public List<LoanResponseDto> getMemberLoans(int memberId){
         if(memberId <=0) throw new InvalidFormatException("Member id can not be zero or negative !");
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException("Member not found!"));
         return member.getLoans().stream()
                 .map(l -> {
                     LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(l);
@@ -222,7 +222,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public MemberResponseDto getMember(int memberId){
         if(memberId <=0) throw new InvalidFormatException("Member id can not be zero or negative !");
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException("Member not found!"));
         return memberMapper.memberToMemberResponseDto(member);
     }
 
@@ -230,22 +230,19 @@ public class AdminServiceImpl implements AdminService {
     @Transactional
     public MemberResponseDto collectFine(int bookId, int fineAmount){
         if(bookId <=0) throw new InvalidFormatException("Book id can not be zero or negative !");
-        if(fineAmount <=0 )throw new FinePayException("Amount can not be zero or negative");
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException("Book not found !"));
-        if(book.getLoan() == null) throw new LoanNotFoundException("No loan found for this book !");
-        if(book.getLoan().getLoanStatus() == LoanStatus.PAID || book.getLoan().getFine() <= 0) throw new LoanNotFoundException("There is no fine on this book or fine on this loan is already paid");
+        if(fineAmount <=0 )throw new InvalidFormatException("Amount can not be zero or negative");
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new NotFoundException("Book not found !"));
+        if(book.getLoan() == null) throw new NotFoundException("No loan found for this book !");
+        if(book.getLoan().getLoanStatus() == LoanStatus.PAID || book.getLoan().getFine() <= 0) throw new NotFoundException("There is no fine on this book or fine on this loan is already paid");
         Member member = book.getLoan().getMember();
-        if(member.getFine() <= 0) throw new FinePayException("Member have no fine to pay!");
-        if(member.getFine() < fineAmount) throw new FinePayException("fine amount is exceeding the total fine!");
-        if (member.getLoans().stream().anyMatch(l -> l.getLoanStatus() == DUE)) {
-            throw new RestrictedAccessException("You have to complete all late book returns first then you can pay fine !");
-        }
-        Loan loan = member.getLoans().stream().filter(l -> l.getFine() == fineAmount).findFirst().orElseThrow(() -> new LoanNotFoundException("No loan found of " + fineAmount + " Rs !"));
+        if(member.getFine() <= 0) throw new ForbiddenException("Member have no fine to pay!");
+        if(member.getFine() < fineAmount) throw new ForbiddenException("fine amount is exceeding the total fine!");
+        Loan loan = book.getLoan();
+        if(loan.getFine() != fineAmount) throw new ForbiddenException("Fine amount is not equal to book's fine amount !");
         loan.setLoanStatus(LoanStatus.PAID);
         book.setLoan(null);
         member.setFine(member.getFine() - fineAmount);
         if (member.getFine() < fineThreshold) member.setMemberStatus(MemberStatus.ACTIVE);
-        memberRepository.save(member);
         return memberMapper.memberToMemberResponseDto(member);
     }
 

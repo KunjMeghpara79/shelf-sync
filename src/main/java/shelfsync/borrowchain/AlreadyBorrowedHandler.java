@@ -1,6 +1,6 @@
 package shelfsync.borrowchain;
 
-import shelfsync.exceptions.BookNotAvailableException;
+import shelfsync.exceptions.NotFoundException;
 
 public class AlreadyBorrowedHandler implements BorrowHandler{
     private BorrowHandler next;
@@ -11,7 +11,7 @@ public class AlreadyBorrowedHandler implements BorrowHandler{
 
     @Override
     public void check(Request request) {
-        if(request.book().getLoan() != null) throw new BookNotAvailableException("This book is already borrowed !");
+        if(request.book().getLoan() != null) throw new NotFoundException("This book is already borrowed !");
         else next.check(request);
     }
 }

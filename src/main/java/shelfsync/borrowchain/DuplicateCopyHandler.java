@@ -1,6 +1,5 @@
 package shelfsync.borrowchain;
-
-import shelfsync.exceptions.BookAlreadyBorrowedException;
+import shelfsync.exceptions.ConflictException;
 
 public class DuplicateCopyHandler implements BorrowHandler{
     private BorrowHandler next;
@@ -13,7 +12,7 @@ public class DuplicateCopyHandler implements BorrowHandler{
     public void check(Request request) {
         if(request.member().getLoans().stream()
                 .anyMatch(l -> l.getBook().getBookName().equals(request.bookData().getBookName()))){
-            throw new BookAlreadyBorrowedException("This member has already borrowed one copy of this book");
+            throw new ConflictException("This member has already borrowed one copy of this book");
         }
         else next.check(request);
     }

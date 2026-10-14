@@ -1,7 +1,7 @@
 package shelfsync.borrowchain;
 
 import shelfsync.enums.MemberStatus;
-import shelfsync.exceptions.RestrictedAccessException;
+import shelfsync.exceptions.UnauthorizedException;
 
 public class RestrictedMemberHandler implements BorrowHandler{
     private BorrowHandler next;
@@ -12,7 +12,7 @@ public class RestrictedMemberHandler implements BorrowHandler{
 
     @Override
     public void check(Request request) {
-        if(request.member().getMemberStatus() == MemberStatus.RESTRICTED) throw new RestrictedAccessException("Member is restricted !");
+        if(request.member().getMemberStatus() == MemberStatus.RESTRICTED) throw new UnauthorizedException("Member is restricted !");
         else next.check(request);
     }
 }

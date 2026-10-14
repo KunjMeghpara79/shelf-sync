@@ -1,10 +1,9 @@
 package shelfsync.exceptions;
 
-public class MemberNotFoundException extends RuntimeException{
-
+public class ConflictException extends RuntimeException {
     private final String message;
 
-    public MemberNotFoundException(String message){this.message = message;}
+    public ConflictException(String message){this.message = message;}
 
     @Override
     public String getMessage() {

@@ -1,9 +1,9 @@
 package shelfsync.exceptions;
 
-public class RestrictedAccessException extends RuntimeException{
+public class ForbiddenException extends RuntimeException {
     private final String message;
 
-    public RestrictedAccessException(String message){this.message = message;}
+    public ForbiddenException(String message){this.message = message;}
 
     @Override
     public String getMessage() {

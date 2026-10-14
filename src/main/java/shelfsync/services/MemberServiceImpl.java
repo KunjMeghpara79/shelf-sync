@@ -55,7 +55,7 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public List<LoanResponseDto> getLoansReport(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Member member = memberRepository.findByMemberEmail(email).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
+        Member member = memberRepository.findByMemberEmail(email).orElseThrow(() -> new NotFoundException("Member not found!"));
         List<Loan> loans = loanRepository.findByLoanStatusInAndMember(List.of(LoanStatus.DUE,LoanStatus.PENDING),member);
         return loans.stream()
                 .map(l -> {
@@ -67,7 +67,7 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public List<LoanResponseDto> getLoanHistory(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Member member = memberRepository.findByMemberEmail(email).orElseThrow(() -> new MemberNotFoundException("Member not found!"));
+        Member member = memberRepository.findByMemberEmail(email).orElseThrow(() -> new NotFoundException("Member not found!"));
         List<Loan> loans = loanRepository.findByLoanStatusInAndMember(List.of(LoanStatus.PAID),member);
         return loans.stream()
                 .map(l -> {
@@ -88,14 +88,14 @@ public class MemberServiceImpl implements MemberService{
 
     @Override
     public List<BookDataResponseDto> findByBookName(SearchRequestDto searchRequestDto) {
-        List<BookData> bookData = bookDataRepository.findBybookNameContainingIgnoreCase(searchRequestDto.name()).orElseThrow(() -> new BookNotFoundException("Book not found!"));
+        List<BookData> bookData = bookDataRepository.findBybookNameContainingIgnoreCase(searchRequestDto.name()).orElseThrow(() -> new NotFoundException("Book not found!"));
         return bookData.stream()
                 .map(b -> bookDataMapper.bookDatatoBookDataResponseDto(b)).toList();
     }
 
     @Override
     public List<BookDataResponseDto> findByAuthorName(SearchRequestDto searchRequestDto) {
-        List<BookData> bookData = bookDataRepository.findByauthorNameContainingIgnoreCase(searchRequestDto.name()).orElseThrow(() -> new BookNotFoundException("No books available of the author " + searchRequestDto.name()));
+        List<BookData> bookData = bookDataRepository.findByauthorNameContainingIgnoreCase(searchRequestDto.name()).orElseThrow(() -> new NotFoundException("No books available of the author " + searchRequestDto.name()));
         return bookData.stream()
                 .map(b -> bookDataMapper.bookDatatoBookDataResponseDto(b)).toList();
     }

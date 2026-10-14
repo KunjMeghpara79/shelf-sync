@@ -1,6 +1,6 @@
 package shelfsync.borrowchain;
 
-import shelfsync.exceptions.BookNotAvailableException;
+import shelfsync.exceptions.NotFoundException;
 
 public class QuantityHandler implements BorrowHandler{
     @Override
@@ -9,6 +9,6 @@ public class QuantityHandler implements BorrowHandler{
 
     @Override
     public void check(Request request) {
-        if(request.bookData().getTotalQuantity() - request.bookData().getLoans().size() <= 0) throw new BookNotAvailableException("No copies Available!");
+        if(request.bookData().getTotalQuantity() - request.bookData().getLoans().size() <= 0) throw new NotFoundException("No copies Available!");
     }
 }

@@ -26,11 +26,11 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<MemberResponseDto> registerMember(@RequestBody @Valid MemberRequestDto memberRequestDto){
         MemberResponseDto memberResponseDto = authService.registerMember(memberRequestDto);
-        return new ResponseEntity<>(memberResponseDto, HttpStatus.OK);
+        return new ResponseEntity<>(memberResponseDto, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<JwtResponseDto> loginMember(@RequestBody @Valid LoginRequestDto loginRequestDto) throws Exception {
+    public ResponseEntity<JwtResponseDto> loginMember(@RequestBody @Valid LoginRequestDto loginRequestDto){
         JwtResponseDto jwt = authService.loginValidation(loginRequestDto);
         return new ResponseEntity<>(jwt,HttpStatus.OK);
     }

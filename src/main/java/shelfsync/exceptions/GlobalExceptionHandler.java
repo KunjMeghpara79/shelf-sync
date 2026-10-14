@@ -13,95 +13,28 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-
-    @ExceptionHandler({
-            MemberNotFoundException.class,
-            BookNotFoundException.class,
-            BookNotAvailableException.class,
-            LoanNotFoundException.class
-    })
+    @ExceptionHandler({NotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNotFoundExceptions(Exception ex) {
-
-        return switch (ex) {
-            case MemberNotFoundException e ->
-                    new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage());
-
-            case BookNotFoundException e ->
-                    new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage());
-
-            case BookNotAvailableException e ->
-                    new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage());
-
-            case LoanNotFoundException e ->
-                    new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage());
-
-            default ->
-                    new ErrorResponse(
-                            HttpStatus.NOT_FOUND.value(),
-                            ex.getMessage()
-                    );
-        };
+    public ErrorResponse handleNotFoundExceptions(NotFoundException ex){
+        return new ErrorResponse(HttpStatus.NOT_FOUND.value(),ex.getMessage());
     }
 
-    @ExceptionHandler({
-            MemberAlreadyExistsException.class,
-            BookAlreadyBorrowedException.class
-    })
+    @ExceptionHandler({ConflictException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleConflictExceptions(Exception ex) {
-
-        return switch (ex) {
-            case MemberAlreadyExistsException e ->
-                    new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage());
-
-            case BookAlreadyBorrowedException e ->
-                    new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage());
-
-            default ->
-                    new ErrorResponse(
-                            HttpStatus.CONFLICT.value(),
-                            ex.getMessage()
-                    );
-        };
+    public ErrorResponse handleConflictExceptions(ConflictException ex){
+        return new ErrorResponse(HttpStatus.CONFLICT.value(),ex.getMessage());
     }
-
-    @ExceptionHandler({
-            InvalidPasswordException.class,
-            FinePayException.class
-    })
+    @ExceptionHandler({ForbiddenException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse handleForbiddenExceptions(Exception ex) {
-
-        return switch (ex) {
-            case InvalidPasswordException e ->
-                    new ErrorResponse(HttpStatus.FORBIDDEN.value(), e.getMessage());
-
-            case FinePayException e ->
-                    new ErrorResponse(HttpStatus.FORBIDDEN.value(), e.getMessage());
-
-            default ->
-                    new ErrorResponse(
-                            HttpStatus.FORBIDDEN.value(),
-                            ex.getMessage()
-                    );
-        };
+    public ErrorResponse handleForbiddenExceptions(ForbiddenException ex){
+        return new ErrorResponse(HttpStatus.FORBIDDEN.value(),ex.getMessage());
     }
-
-    @ExceptionHandler(RestrictedAccessException.class)
+    @ExceptionHandler({UnauthorizedException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ErrorResponse handleUnauthorizedException(
-            RestrictedAccessException ex) {
-
-        return switch (ex) {
-            case RestrictedAccessException e ->
-                    new ErrorResponse(
-                            HttpStatus.UNAUTHORIZED.value(),
-                            e.getMessage()
-                    );
-
-        };
+    public ErrorResponse handleUnauthorizedExceptions(UnauthorizedException ex){
+        return new ErrorResponse(HttpStatus.FORBIDDEN.value(),ex.getMessage());
     }
+
 
     @ExceptionHandler({
             MethodArgumentNotValidException.class,
