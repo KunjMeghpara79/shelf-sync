@@ -14,4 +14,5 @@ public interface AdminService {
     LoanResponseDto issueBook(int bookId, int memberId);
     LoanResponseDto collectBook(int id);
     MemberResponseDto collectTotalFine(int memberId,int fineAmount);
+    LoanResponseDto renewLoan(int bookId);
 }

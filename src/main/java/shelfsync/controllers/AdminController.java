@@ -73,5 +73,10 @@ public class AdminController {
         MemberResponseDto memberResponseDto = adminService.collectTotalFine(memberId,fineAmount);
         return new ResponseEntity<>(memberResponseDto,HttpStatus.OK);
     }
+    @PutMapping("book/renew/{bookId}")
+    public ResponseEntity<LoanResponseDto> renewBook(@PathVariable int bookId){
+        LoanResponseDto loanResponseDto = adminService.renewLoan(bookId);
+        return new ResponseEntity<>(loanResponseDto,HttpStatus.OK);
+    }
 
 }

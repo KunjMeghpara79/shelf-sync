@@ -21,6 +21,7 @@ import shelfsync.services.interfaces.EmailService;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -169,6 +170,22 @@ public class AdminServiceImpl implements AdminService {
             member.setFine(0);
         }else throw new FinePayException("Total fine for the member is not equal to fine amount !");
         return memberMapper.memberToMemberResponseDto(member);
+    }
+
+    @Override
+    @Transactional
+    public LoanResponseDto renewLoan(int bookId) {
+        if(bookId <=0 )throw new InvalidFormatException("Book id can not be zero or negative");
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException("Book not found !"));
+        Loan loan = book.getLoan();
+        if(loan == null) throw new LoanNotFoundException("No loan found for the book "+ book.getBookName());
+        long diff = ChronoUnit.DAYS.between(loan.getIssueDate(), loan.getDueDate());
+        if(loan.getLoanStatus() == DUE || loan.getLoanStatus() == LoanStatus.PAID) throw new RestrictedAccessException("Only pending loans can be renewed");
+        if(diff > 5) throw new RestrictedAccessException("The book can be renewed only once !");
+        else{
+            loan.setDueDate(loan.getDueDate().plusDays(5));
+        }
+        return loanMapper.loanToLoanResponseDto(loan);
     }
 
     @Override
