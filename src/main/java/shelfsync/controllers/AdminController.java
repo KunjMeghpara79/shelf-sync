@@ -29,12 +29,14 @@ public class AdminController {
     @GetMapping("/reports")
     public ResponseEntity<List<LoanResponseDto>> generateReport() {
         List<LoanResponseDto> loanResponseDtos = adminService.getLoansReport();
+        if(loanResponseDtos.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         return new ResponseEntity<>(loanResponseDtos, HttpStatus.OK);
     }
 
     @GetMapping("/reports/{memberId}")
     public ResponseEntity<List<LoanResponseDto>> generateMemberReport(@PathVariable int memberId) {
         List<LoanResponseDto> loanResponseDtos = adminService.getMemberLoans(memberId);
+        if(loanResponseDtos.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         return new ResponseEntity<>(loanResponseDtos, HttpStatus.OK);
     }
 

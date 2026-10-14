@@ -10,18 +10,14 @@ import shelfsync.enums.MemberStatus;
 import shelfsync.exceptions.*;
 import shelfsync.mappers.BookDataMapper;
 import shelfsync.mappers.LoanMapper;
-import shelfsync.models.dto.BookDataResponseDto;
-import shelfsync.models.dto.LoanResponseDto;
-import shelfsync.models.dto.SearchRequestDto;
-import shelfsync.models.entities.BookData;
-import shelfsync.models.entities.Loan;
-import shelfsync.models.entities.Member;
-import shelfsync.repositories.BookDataRepository;
-import shelfsync.repositories.BookRepository;
-import shelfsync.repositories.LoanRepository;
-import shelfsync.repositories.MemberRepository;
+import shelfsync.mappers.ReviewMapper;
+import shelfsync.models.dto.*;
+import shelfsync.models.entities.*;
+import shelfsync.repositories.*;
 import shelfsync.services.interfaces.MemberService;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 
 @Service
@@ -32,15 +28,21 @@ public class MemberServiceImpl implements MemberService{
     private final LoanRepository loanRepository;
     private final LoanMapper loanMapper;
     private final BookDataMapper bookDataMapper;
+    private final ReviewMapper reviewMapper;
     @Value("${member.fine.threshold}")
     private int fineThreshold;
+    private final BookRepository bookRepository;
+    private final ReviewRepository reviewRepository;
 
-    public MemberServiceImpl(MemberRepository memberRepository, BookDataRepository bookDataRepository, LoanRepository loanRepository, LoanMapper loanMapper, BookDataMapper bookDataMapper, BookRepository bookRepository) {
+    public MemberServiceImpl(MemberRepository memberRepository, BookDataRepository bookDataRepository, LoanRepository loanRepository, LoanMapper loanMapper, BookDataMapper bookDataMapper, BookRepository bookRepository, BookRepository bookRepository1, ReviewMapper reviewMapper, ReviewRepository reviewRepository) {
         this.memberRepository = memberRepository;
         this.bookDataRepository = bookDataRepository;
         this.loanRepository = loanRepository;
         this.loanMapper = loanMapper;
         this.bookDataMapper = bookDataMapper;
+        this.bookRepository = bookRepository;
+        this.reviewMapper = reviewMapper;
+        this.reviewRepository = reviewRepository;
     }
 
     @Scheduled(fixedRate = 1000)
@@ -98,6 +100,34 @@ public class MemberServiceImpl implements MemberService{
         List<BookData> bookData = bookDataRepository.findByauthorNameContainingIgnoreCase(searchRequestDto.name()).orElseThrow(() -> new NotFoundException("No books available of the author " + searchRequestDto.name()));
         return bookData.stream()
                 .map(b -> bookDataMapper.bookDatatoBookDataResponseDto(b)).toList();
+    }
+
+    @Override
+    public ReviewResponseDto addBookReview(ReviewRequestDto reviewRequestDto) {
+        Book book = bookRepository.findById(reviewRequestDto.bookId()).orElseThrow(() -> new NotFoundException("Book not found !"));
+        BookData bookData = book.getBookData();
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Member member = memberRepository.findByMemberEmail(email).orElseThrow(() ->  new NotFoundException("Member not found !"));
+        Set<Loan> loanSet = member.getLoans();
+        if(loanSet.stream().noneMatch(l -> l.getBook().getBookName() == book.getBookName())){
+            throw new ForbiddenException("You can add review of only those books which are borrowed by you !");
+        }
+        Review review = reviewRepository.findByBookDataAndMember(bookData,member);
+        if(review == null){
+            review = new Review(reviewRequestDto.rating(),reviewRequestDto.description(),member,bookData);
+        }
+        else {
+            review.setDescription(reviewRequestDto.description());
+            review.setRating(reviewRequestDto.rating());
+        }
+        reviewRepository.save(review);
+        return reviewMapper.reviewToReviewResponseDto(review).withBookAndMemberName(book.getBookName(),member.getMemberName());
+    }
+
+    @Override
+    public List<ReviewResponseDto> getAllReviews() {
+        List<Review> list = reviewRepository.findAll();
+        return list.stream().map(r -> reviewMapper.reviewToReviewResponseDto(r)).toList();
     }
 
 
