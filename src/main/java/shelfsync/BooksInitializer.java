@@ -29,7 +29,10 @@ public class BooksInitializer implements CommandLineRunner {
     @Value("${admin.password}")
     private String adminPassword;
 
-    public BooksInitializer(AdminRepository adminRepository, PasswordEncoder passwordEncoder, BookRepository bookRepository, BookDataRepository bookDataRepository) {
+    public BooksInitializer(AdminRepository adminRepository,
+                            PasswordEncoder passwordEncoder,
+                            BookRepository bookRepository,
+                            BookDataRepository bookDataRepository) {
         this.adminRepository = adminRepository;
         this.passwordEncoder = passwordEncoder;
         this.bookRepository = bookRepository;
