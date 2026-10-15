@@ -1,12 +1,10 @@
 package shelfsync.controllers;
 
-import ch.qos.logback.core.pattern.util.RegularEscapeUtil;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shelfsync.models.dto.*;
-import shelfsync.services.MemberServiceImpl;
 import shelfsync.services.interfaces.AdminService;
 
 import java.util.List;
@@ -80,5 +78,4 @@ public class AdminController {
         LoanResponseDto loanResponseDto = adminService.renewLoan(bookId);
         return new ResponseEntity<>(loanResponseDto,HttpStatus.OK);
     }
-
 }

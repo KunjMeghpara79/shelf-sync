@@ -62,4 +62,10 @@ public class MemberController {
         if(list.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         return new ResponseEntity<>(list,HttpStatus.OK);
     }
+    @PostMapping("review")
+    public ResponseEntity<List<ReviewResponseDto>> getReviewforBook(@Valid @RequestBody SearchRequestDto searchRequestDto){
+        List<ReviewResponseDto> list = memberService.getBookReview(searchRequestDto);
+        if(list.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(list,HttpStatus.OK);
+    }
 }

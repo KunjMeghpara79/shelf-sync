@@ -71,7 +71,11 @@ public class AdminServiceImpl implements AdminService {
         </body>
         </html>
         """;
-    public AdminServiceImpl(AdminRepository adminRepository, PasswordEncoder passwordEncoder, JwtService jwtService, LoanRepository loanRepository, LoanMapper loanMapper, MemberMapper memberMapper, MemberRepository memberRepository, BookDataRepository bookDataRepository, BookDataMapper bookDataMapper, BookRepository bookRepository, EmailService emailService) {
+    public AdminServiceImpl(AdminRepository adminRepository, PasswordEncoder passwordEncoder,
+                            JwtService jwtService, LoanRepository loanRepository,
+                            LoanMapper loanMapper, MemberMapper memberMapper,
+                            MemberRepository memberRepository, BookDataRepository bookDataRepository,
+                            BookDataMapper bookDataMapper, BookRepository bookRepository, EmailService emailService) {
         this.adminRepository = adminRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
@@ -98,7 +102,10 @@ public class AdminServiceImpl implements AdminService {
         BookData bookData = book.get().getBookData();
         Optional<Member> member = memberRepository.findById(memberId);
         if(member.isEmpty()) throw new NotFoundException("Member not found !");
-        if(member.get().getLoans().stream().filter(l -> l.getLoanStatus() == LoanStatus.PENDING || l.getLoanStatus() == DUE).toList().size() >= borrowingThreshold){
+        if(member.get().getLoans()
+                .stream()
+                .filter(l -> l.getLoanStatus() == LoanStatus.PENDING || l.getLoanStatus() == DUE)
+                .toList().size() >= borrowingThreshold){
             throw new ForbiddenException("This member has exceeded the borrowing limit !");
         }
         Request request = new Request(book.get(),bookData,member.get());
@@ -233,7 +240,9 @@ public class AdminServiceImpl implements AdminService {
         if(fineAmount <=0 )throw new InvalidFormatException("Amount can not be zero or negative");
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new NotFoundException("Book not found !"));
         if(book.getLoan() == null) throw new NotFoundException("No loan found for this book !");
-        if(book.getLoan().getLoanStatus() == LoanStatus.PAID || book.getLoan().getFine() <= 0) throw new NotFoundException("There is no fine on this book or fine on this loan is already paid");
+        if(book.getLoan().getLoanStatus() == LoanStatus.PAID || book.getLoan().getFine() <= 0) {
+            throw new NotFoundException("There is no fine on this book or fine on this loan is already paid");
+        }
         Member member = book.getLoan().getMember();
         if(member.getFine() <= 0) throw new ForbiddenException("Member have no fine to pay!");
         if(member.getFine() < fineAmount) throw new ForbiddenException("fine amount is exceeding the total fine!");

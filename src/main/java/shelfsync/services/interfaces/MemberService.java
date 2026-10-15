@@ -12,4 +12,5 @@ public interface MemberService {
     List<BookDataResponseDto> findByAuthorName(SearchRequestDto searchRequestDto);
     ReviewResponseDto addBookReview(ReviewRequestDto reviewRequestDto);
     List<ReviewResponseDto> getAllReviews();
+    List<ReviewResponseDto> getBookReview(SearchRequestDto searchRequestDto);
 }

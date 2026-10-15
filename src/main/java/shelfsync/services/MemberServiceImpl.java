@@ -15,8 +15,8 @@ import shelfsync.models.dto.*;
 import shelfsync.models.entities.*;
 import shelfsync.repositories.*;
 import shelfsync.services.interfaces.MemberService;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 
@@ -34,7 +34,11 @@ public class MemberServiceImpl implements MemberService{
     private final BookRepository bookRepository;
     private final ReviewRepository reviewRepository;
 
-    public MemberServiceImpl(MemberRepository memberRepository, BookDataRepository bookDataRepository, LoanRepository loanRepository, LoanMapper loanMapper, BookDataMapper bookDataMapper, BookRepository bookRepository, BookRepository bookRepository1, ReviewMapper reviewMapper, ReviewRepository reviewRepository) {
+    public MemberServiceImpl(MemberRepository memberRepository,
+                             BookDataRepository bookDataRepository,
+                             LoanRepository loanRepository, LoanMapper loanMapper,
+                             BookDataMapper bookDataMapper, BookRepository bookRepository,
+                             ReviewMapper reviewMapper, ReviewRepository reviewRepository) {
         this.memberRepository = memberRepository;
         this.bookDataRepository = bookDataRepository;
         this.loanRepository = loanRepository;
@@ -90,14 +94,18 @@ public class MemberServiceImpl implements MemberService{
 
     @Override
     public List<BookDataResponseDto> findByBookName(SearchRequestDto searchRequestDto) {
-        List<BookData> bookData = bookDataRepository.findBybookNameContainingIgnoreCase(searchRequestDto.name()).orElseThrow(() -> new NotFoundException("Book not found!"));
+        List<BookData> bookData = bookDataRepository
+                .findBybookNameContainingIgnoreCase(searchRequestDto.name())
+                .orElseThrow(() -> new NotFoundException("Book not found!"));
         return bookData.stream()
                 .map(b -> bookDataMapper.bookDatatoBookDataResponseDto(b)).toList();
     }
 
     @Override
     public List<BookDataResponseDto> findByAuthorName(SearchRequestDto searchRequestDto) {
-        List<BookData> bookData = bookDataRepository.findByauthorNameContainingIgnoreCase(searchRequestDto.name()).orElseThrow(() -> new NotFoundException("No books available of the author " + searchRequestDto.name()));
+        List<BookData> bookData = bookDataRepository
+                .findByauthorNameContainingIgnoreCase(searchRequestDto.name())
+                .orElseThrow(() -> new NotFoundException("No books available of the author " + searchRequestDto.name()));
         return bookData.stream()
                 .map(b -> bookDataMapper.bookDatatoBookDataResponseDto(b)).toList();
     }
@@ -130,5 +138,18 @@ public class MemberServiceImpl implements MemberService{
         return list.stream().map(r -> reviewMapper.reviewToReviewResponseDto(r)).toList();
     }
 
-
+    @Override
+    public List<ReviewResponseDto> getBookReview(SearchRequestDto searchRequestDto) {
+        List<BookData> bookDataList = bookDataRepository
+                .findBybookNameContainingIgnoreCase(searchRequestDto.name())
+                .orElseThrow(() -> new NotFoundException("Book not found !"));
+        List<Review> reviews = new ArrayList<>();
+        for(BookData bookData : bookDataList){
+            reviews.addAll(reviewRepository.findByBookData(bookData));
+        }
+        return reviews
+                .stream()
+                .map(r -> reviewMapper.reviewToReviewResponseDto(r)
+                        .withBookAndMemberName(r.getBookData().getBookName(),r.getMember().getMemberName())).toList();
+    }
 }
