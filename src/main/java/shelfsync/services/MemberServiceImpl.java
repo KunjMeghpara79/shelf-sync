@@ -165,7 +165,4 @@ public class MemberServiceImpl implements MemberService{
         BookCategory bookCategory1 = BookCategory.valueOf(bookCategory.toUpperCase());
         return bookDataRepository.findByBookCategory(bookCategory1).stream().map(bookDataMapper::bookDatatoBookDataResponseDto).toList();
     }
-
-
-
 }
