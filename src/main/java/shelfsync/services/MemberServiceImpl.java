@@ -1,10 +1,12 @@
 package shelfsync.services;
 
 import jakarta.transaction.Transactional;
+import org.apache.el.stream.Stream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import shelfsync.enums.BookCategory;
 import shelfsync.enums.LoanStatus;
 import shelfsync.enums.MemberStatus;
 import shelfsync.exceptions.*;
@@ -18,6 +20,8 @@ import shelfsync.services.interfaces.MemberService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import static java.util.Arrays.stream;
 
 
 @Service
@@ -152,4 +156,16 @@ public class MemberServiceImpl implements MemberService{
                 .map(r -> reviewMapper.reviewToReviewResponseDto(r)
                         .withBookAndMemberName(r.getBookData().getBookName(),r.getMember().getMemberName())).toList();
     }
+
+    @Override
+    public List<BookDataResponseDto> getBookbyCategory(String bookCategory){
+        if(stream(BookCategory.values()).noneMatch(e -> e.name().equalsIgnoreCase(bookCategory))){
+            throw new ForbiddenException("No match found for the category : " + bookCategory);
+        }
+        BookCategory bookCategory1 = BookCategory.valueOf(bookCategory.toUpperCase());
+        return bookDataRepository.findByBookCategory(bookCategory1).stream().map(bookDataMapper::bookDatatoBookDataResponseDto).toList();
+    }
+
+
+
 }

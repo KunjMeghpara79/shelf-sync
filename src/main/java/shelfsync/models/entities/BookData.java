@@ -1,6 +1,7 @@
 package shelfsync.models.entities;
 import jakarta.persistence.*;
 import lombok.*;
+import shelfsync.enums.BookCategory;
 
 import java.util.Set;
 
@@ -31,6 +32,9 @@ public class BookData {
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
    @JoinColumn(name = "book_data_id")
    private Set<Loan> loans;
+
+   @Enumerated(EnumType.STRING)
+   private BookCategory bookCategory;
 
     public BookData(String bookName, int totalQuantity){
         this.bookName = bookName;

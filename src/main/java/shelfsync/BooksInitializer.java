@@ -1,6 +1,7 @@
 package shelfsync;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import shelfsync.enums.BookCategory;
 import shelfsync.models.entities.Admin;
 import shelfsync.models.entities.Book;
 import shelfsync.models.entities.BookData;
@@ -47,7 +48,6 @@ public class BooksInitializer implements CommandLineRunner {
             admin.setAdminName("Admin");
             admin.setPassword(passwordEncoder.encode(adminPassword));
             adminRepository.save(admin);
-
         }
         if (bookDataRepository.count() > 0) {
             return;
@@ -69,26 +69,31 @@ public class BooksInitializer implements CommandLineRunner {
                 "J.R.R. Tolkien"
         );
 
+        List<BookCategory> dummyCategories = Arrays.asList(
+                BookCategory.LITERATURE,
+                BookCategory.LITERATURE,
+                BookCategory.SCIENCE_FICTION,
+                BookCategory.ROMANCE,
+                BookCategory.FANTASY
+        );
+
         List<BookData> bookDataListToSave = new ArrayList<>();
         List<Book> booksToSave = new ArrayList<>();
 
         for (int i = 0; i < dummyTitles.size(); i++) {
             String title = dummyTitles.get(i);
             String author = dummyAuthors.get(i);
-
+            BookCategory category = dummyCategories.get(i);
             int totalQty = 3 + (i % 3);
-
             BookData bookData = new BookData(title, totalQty);
             bookData.setAuthorName(author);
+            bookData.setBookCategory(category);
             bookData.setBooks(new HashSet<>());
             bookDataListToSave.add(bookData);
-
             for (int j = 1; j <= totalQty; j++) {
                 Book book = new Book();
                 book.setBookName(title);
                 book.setBookData(bookData);
-                book.setLoan(null);
-
                 bookData.getBooks().add(book);
                 booksToSave.add(book);
             }
@@ -96,7 +101,5 @@ public class BooksInitializer implements CommandLineRunner {
 
         bookDataRepository.saveAll(bookDataListToSave);
         bookRepository.saveAll(booksToSave);
-
-
     }
 }

@@ -32,33 +32,57 @@ public class AdminController {
     }
 
     @GetMapping("/reports/{memberId}")
-    public ResponseEntity<List<LoanResponseDto>> generateMemberReport(@PathVariable int memberId) {
-        List<LoanResponseDto> loanResponseDtos = adminService.getMemberLoans(memberId);
+    public ResponseEntity<List<LoanResponseDto>> generateMemberReport(@PathVariable String memberId) {
+        if (!memberId.matches("[0-9]+")) {
+            throw new IllegalArgumentException("Member ID must contain digits only");
+        }
+        int id = Integer.parseInt(memberId);
+        List<LoanResponseDto> loanResponseDtos = adminService.getMemberLoans(id);
         if(loanResponseDtos.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         return new ResponseEntity<>(loanResponseDtos, HttpStatus.OK);
     }
 
     @PostMapping("/issue-book/{bookId}/{memberId}")
-    public ResponseEntity<LoanResponseDto> borrowBook(@PathVariable int bookId, @PathVariable int memberId) {
-        LoanResponseDto loanResponseDto = adminService.issueBook(bookId, memberId);
+    public ResponseEntity<LoanResponseDto> borrowBook(@PathVariable String bookId, @PathVariable String memberId) {
+        if(!bookId.matches("[0-9]+")){
+            throw new IllegalArgumentException("Book id can contain digits only !");
+        }
+        int bId = Integer.parseInt(bookId);
+        if(!memberId.matches("[0-9]+")){
+            throw new IllegalArgumentException("Member id can contain digits only !");
+        }
+        int mId = Integer.parseInt(memberId);
+        LoanResponseDto loanResponseDto = adminService.issueBook(bId, mId);
         return new ResponseEntity<>(loanResponseDto, HttpStatus.CREATED);
     }
 
     @PostMapping("/accept-book/{bookId}")
-    public ResponseEntity<LoanResponseDto> returnBook(@PathVariable int bookId) {
-        LoanResponseDto loanResponseDto = adminService.collectBook(bookId);
+    public ResponseEntity<LoanResponseDto> returnBook(@PathVariable String bookId) {
+        if(!bookId.matches("[0-9]+")){
+            throw new IllegalArgumentException("Book id can contain digits only !");
+        }
+        int bId = Integer.parseInt(bookId);
+        LoanResponseDto loanResponseDto = adminService.collectBook(bId);
         return new ResponseEntity<>(loanResponseDto, HttpStatus.OK);
     }
 
     @GetMapping("/{memberId}")
-    public ResponseEntity<MemberResponseDto> getMember(@PathVariable int memberId) {
-        MemberResponseDto memberResponseDto = adminService.getMember(memberId);
+    public ResponseEntity<MemberResponseDto> getMember(@PathVariable String memberId) {
+        if (!memberId.matches("[0-9]+")) {
+            throw new IllegalArgumentException("Member ID must contain digits only");
+        }
+        int id = Integer.parseInt(memberId);
+        MemberResponseDto memberResponseDto = adminService.getMember(id);
         return new ResponseEntity<>(memberResponseDto, HttpStatus.OK);
     }
 
     @PutMapping("/fine/{bookId}/{fineAmount}")
-    public ResponseEntity<MemberResponseDto> finePay(@PathVariable int bookId, @PathVariable int fineAmount) {
-        MemberResponseDto memberResponseDto = adminService.collectFine(bookId, fineAmount);
+    public ResponseEntity<MemberResponseDto> finePay(@PathVariable String bookId, @PathVariable int fineAmount) {
+        if(!bookId.matches("[0-9]+")){
+            throw new IllegalArgumentException("Book id can contain digits only !");
+        }
+        int bId = Integer.parseInt(bookId);
+        MemberResponseDto memberResponseDto = adminService.collectFine(bId, fineAmount);
         return new ResponseEntity<>(memberResponseDto, HttpStatus.OK);
     }
 
@@ -69,13 +93,21 @@ public class AdminController {
     }
 
     @PutMapping("/fine/collect-total/{memberId}/{fineAmount}")
-    public ResponseEntity<MemberResponseDto> collectTotalFine(@PathVariable int memberId,@PathVariable int fineAmount){
-        MemberResponseDto memberResponseDto = adminService.collectTotalFine(memberId,fineAmount);
+    public ResponseEntity<MemberResponseDto> collectTotalFine(@PathVariable String memberId,@PathVariable int fineAmount){
+        if(!memberId.matches("[0-9]+")){
+            throw new IllegalArgumentException("Member id can contain digits only !");
+        }
+        int mId = Integer.parseInt(memberId);
+        MemberResponseDto memberResponseDto = adminService.collectTotalFine(mId,fineAmount);
         return new ResponseEntity<>(memberResponseDto,HttpStatus.OK);
     }
     @PutMapping("book/renew/{bookId}")
-    public ResponseEntity<LoanResponseDto> renewBook(@PathVariable int bookId){
-        LoanResponseDto loanResponseDto = adminService.renewLoan(bookId);
+    public ResponseEntity<LoanResponseDto> renewBook(@PathVariable String bookId){
+        if(!bookId.matches("[0-9]+")){
+            throw new IllegalArgumentException("Book id can contain digits only !");
+        }
+        int bId = Integer.parseInt(bookId);
+        LoanResponseDto loanResponseDto = adminService.renewLoan(bId);
         return new ResponseEntity<>(loanResponseDto,HttpStatus.OK);
     }
 }

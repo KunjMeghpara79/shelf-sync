@@ -1,5 +1,6 @@
 package shelfsync.services.interfaces;
 
+import shelfsync.enums.BookCategory;
 import shelfsync.models.dto.*;
 
 import java.util.List;
@@ -13,4 +14,5 @@ public interface MemberService {
     ReviewResponseDto addBookReview(ReviewRequestDto reviewRequestDto);
     List<ReviewResponseDto> getAllReviews();
     List<ReviewResponseDto> getBookReview(SearchRequestDto searchRequestDto);
+    List<BookDataResponseDto> getBookbyCategory(String bookCategory);
 }

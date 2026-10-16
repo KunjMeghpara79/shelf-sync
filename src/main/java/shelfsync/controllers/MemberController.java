@@ -68,4 +68,11 @@ public class MemberController {
         if(list.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         return new ResponseEntity<>(list,HttpStatus.OK);
     }
+
+    @GetMapping("category/{bookCategory}")
+    public ResponseEntity<List<BookDataResponseDto>> getBookbyCategory(@PathVariable String bookCategory){
+        List<BookDataResponseDto> list = memberService.getBookbyCategory(bookCategory);
+        if(list.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(list,HttpStatus.OK);
+    }
 }

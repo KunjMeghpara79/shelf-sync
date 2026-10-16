@@ -42,6 +42,7 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException.class,
             HttpMessageNotReadableException.class,
             MethodArgumentTypeMismatchException.class,
+            IllegalArgumentException.class,
             InvalidFormatException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -63,6 +64,9 @@ public class GlobalExceptionHandler {
             case HttpMessageNotReadableException e -> {
 
                 yield new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Error: Invalid JSON structure or incorrect data types.");
+            }
+            case IllegalArgumentException e -> {
+                yield new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
             }
 
             case MethodArgumentTypeMismatchException e -> {
