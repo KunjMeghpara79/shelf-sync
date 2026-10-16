@@ -220,10 +220,9 @@ public class AdminServiceImpl implements AdminService {
         if(memberId <=0) throw new InvalidFormatException("Member id can not be zero or negative !");
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException("Member not found!"));
         return member.getLoans().stream()
-                .map(l -> {
-                    LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(l);
-                    return loanResponseDto.withBookName(member.getMemberName(),l.getBook().getBookName());
-                }).toList();
+                .map(l ->
+                    loanMapper.loanToLoanResponseDto(l).withBookName(member.getMemberName(),l.getBook().getBookName())
+                ).toList();
     }
 
     @Override
