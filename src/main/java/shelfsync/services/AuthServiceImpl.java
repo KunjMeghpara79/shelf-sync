@@ -1,6 +1,5 @@
 package shelfsync.services;
 import shelfsync.exceptions.ConflictException;
-import shelfsync.exceptions.ForbiddenException;
 import shelfsync.exceptions.NotFoundException;
 import shelfsync.exceptions.UnauthorizedException;
 import shelfsync.mappers.MemberMapper;

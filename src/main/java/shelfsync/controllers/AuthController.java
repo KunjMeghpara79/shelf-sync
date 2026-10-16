@@ -4,7 +4,6 @@ import shelfsync.models.dto.JwtResponseDto;
 import shelfsync.models.dto.LoginRequestDto;
 import shelfsync.models.dto.MemberRequestDto;
 import shelfsync.models.dto.MemberResponseDto;
-import shelfsync.services.AuthServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

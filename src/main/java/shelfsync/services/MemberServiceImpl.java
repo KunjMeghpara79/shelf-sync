@@ -1,7 +1,6 @@
 package shelfsync.services;
 
 import jakarta.transaction.Transactional;
-import org.apache.el.stream.Stream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -93,7 +92,7 @@ public class MemberServiceImpl implements MemberService{
         bookData = bookData.stream()
                 .filter(b -> b.getTotalQuantity() - b.getLoans().size() > 0).toList();
         return bookData.stream()
-                .map(b -> bookDataMapper.bookDatatoBookDataResponseDto(b)).toList();
+                .map(bookDataMapper::bookDatatoBookDataResponseDto).toList();
     }
 
     @Override
@@ -102,7 +101,7 @@ public class MemberServiceImpl implements MemberService{
                 .findBybookNameContainingIgnoreCase(searchRequestDto.name())
                 .orElseThrow(() -> new NotFoundException("Book not found!"));
         return bookData.stream()
-                .map(b -> bookDataMapper.bookDatatoBookDataResponseDto(b)).toList();
+                .map(bookDataMapper::bookDatatoBookDataResponseDto).toList();
     }
 
     @Override
@@ -111,7 +110,7 @@ public class MemberServiceImpl implements MemberService{
                 .findByauthorNameContainingIgnoreCase(searchRequestDto.name())
                 .orElseThrow(() -> new NotFoundException("No books available of the author " + searchRequestDto.name()));
         return bookData.stream()
-                .map(b -> bookDataMapper.bookDatatoBookDataResponseDto(b)).toList();
+                .map(bookDataMapper::bookDatatoBookDataResponseDto).toList();
     }
 
     @Override
@@ -121,7 +120,7 @@ public class MemberServiceImpl implements MemberService{
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Member member = memberRepository.findByMemberEmail(email).orElseThrow(() ->  new NotFoundException("Member not found !"));
         Set<Loan> loanSet = member.getLoans();
-        if(loanSet.stream().noneMatch(l -> l.getBook().getBookName() == book.getBookName())){
+        if(loanSet.stream().noneMatch(l -> l.getBook().getBookName().equals(book.getBookName()))){
             throw new ForbiddenException("You can add review of only those books which are borrowed by you !");
         }
         Review review = reviewRepository.findByBookDataAndMember(bookData,member);
@@ -139,7 +138,7 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public List<ReviewResponseDto> getAllReviews() {
         List<Review> list = reviewRepository.findAll();
-        return list.stream().map(r -> reviewMapper.reviewToReviewResponseDto(r)).toList();
+        return list.stream().map(reviewMapper::reviewToReviewResponseDto).toList();
     }
 
     @Override

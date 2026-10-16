@@ -28,7 +28,7 @@ public class LoanScheduler {
     private int FIXED_FINE;
 
     private final EmailService emailService;
-    private String message = """
+    private final String message = """
         <html>
         <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
             <h2 style="color: #d32f2f;">Book Return Reminder</h2>

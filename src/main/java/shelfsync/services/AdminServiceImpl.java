@@ -2,7 +2,6 @@ package shelfsync.services;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import shelfsync.borrowchain.*;
@@ -25,9 +24,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-
-import static java.util.stream.Collectors.toList;
 import static shelfsync.enums.LoanStatus.DUE;
 
 @Service
@@ -48,7 +44,7 @@ public class AdminServiceImpl implements AdminService {
     private int fineThreshold;
     @Value("${member.borrow.threshold}")
     private int borrowingThreshold;
-    private String message = """
+    private final String message = """
         <html>
         <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
             <h2 style="color: #2e7d32;">Book Borrowing Confirmation</h2>

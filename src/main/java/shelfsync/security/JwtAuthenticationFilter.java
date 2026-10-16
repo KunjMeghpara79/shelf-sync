@@ -3,7 +3,6 @@ import io.jsonwebtoken.MalformedJwtException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.firewall.RequestRejectedException;
 import shelfsync.exceptions.ErrorResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -74,27 +73,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             response.setContentType("application/json");
             ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "JWT has expired");
             objectMapper.writeValue(response.getWriter(),errorResponse);
-            return;
         }catch (MalformedJwtException ex){
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType("application/json");
             ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "JWT is tampered");
             objectMapper.writeValue(response.getWriter(), errorResponse);
-            return;
+
         }
         catch (SignatureException e) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType("application/json");
             ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "JWT is tampered");
             objectMapper.writeValue(response.getWriter(), errorResponse);
-            return;
         }
         catch (UsernameNotFoundException ex){
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType("application/json");
             ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
             objectMapper.writeValue(response.getWriter(), errorResponse);
-            return;
+
         }
     }
 }

@@ -1,5 +1,6 @@
 package shelfsync.exceptions;
 
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -55,7 +56,7 @@ public class GlobalExceptionHandler {
                 String errorMessage = e.getBindingResult()
                         .getFieldErrors()
                         .stream()
-                        .map(error -> error.getDefaultMessage())
+                        .map(DefaultMessageSourceResolvable::getDefaultMessage)
                         .collect(Collectors.joining(", "));
 
                 yield new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Validation Failed: " + errorMessage);

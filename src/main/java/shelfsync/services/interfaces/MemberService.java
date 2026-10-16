@@ -1,6 +1,5 @@
 package shelfsync.services.interfaces;
 
-import shelfsync.enums.BookCategory;
 import shelfsync.models.dto.*;
 
 import java.util.List;
