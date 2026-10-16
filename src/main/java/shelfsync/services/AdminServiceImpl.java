@@ -209,10 +209,9 @@ public class AdminServiceImpl implements AdminService {
     public List<LoanResponseDto> getLoansReport(){
         List<Loan> loans = loanRepository.findByLoanStatusIn(List.of(DUE,LoanStatus.PENDING));
         return loans.stream()
-                .map(l ->{
-                    LoanResponseDto loanResponseDto = loanMapper.loanToLoanResponseDto(l);
-                    return loanResponseDto.withBookName(l.getMember().getMemberName(),l.getBook().getBookName());
-                }).toList();
+                .map(l ->
+                    loanMapper.loanToLoanResponseDto(l).withBookName(l.getMember().getMemberName(),l.getBook().getBookName())
+                ).toList();
     }
 
     @Override
