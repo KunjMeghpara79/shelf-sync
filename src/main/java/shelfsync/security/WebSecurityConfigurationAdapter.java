@@ -51,6 +51,7 @@ public class WebSecurityConfigurationAdapter {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/admin/login").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/member/available-books").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

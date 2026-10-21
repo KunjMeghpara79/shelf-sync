@@ -252,6 +252,11 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public BookDataResponseDto addBook( BookDataRequestDto bookDataRequestDto){
+        if(bookDataRepository.findByBookNameAndAuthorNameAndBookCategory(bookDataRequestDto.bookName()
+                ,bookDataRequestDto.authorName()
+                ,bookDataRequestDto.bookCategory()).isPresent()){
+            throw new ForbiddenException("This book is already there in the library !");
+        }
         BookData bookData = bookDataMapper.bookDataRequestDtoToBookData(bookDataRequestDto);
         bookDataRepository.save(bookData);
         List<Book> books = new ArrayList<>();
