@@ -90,7 +90,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             response.setContentType("application/json");
             ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
             objectMapper.writeValue(response.getWriter(), errorResponse);
-
         }
     }
 }
