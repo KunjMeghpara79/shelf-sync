@@ -78,7 +78,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             response.setContentType("application/json");
             ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "JWT is tampered");
             objectMapper.writeValue(response.getWriter(), errorResponse);
-
         }
         catch (SignatureException e) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
