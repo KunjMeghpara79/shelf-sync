@@ -38,7 +38,6 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(HttpStatus.FORBIDDEN.value(),ex.getMessage());
     }
 
-
     @ExceptionHandler({
             MethodArgumentNotValidException.class,
             HttpMessageNotReadableException.class,
