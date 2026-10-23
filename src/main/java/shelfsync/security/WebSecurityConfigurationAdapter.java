@@ -21,7 +21,6 @@ public class WebSecurityConfigurationAdapter {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-
     private final UserDetailsService customUserDetailsService;
 
     public WebSecurityConfigurationAdapter(JwtAuthenticationFilter jwtAuthenticationFilter, UserDetailsService customUserDetailsService) {
