@@ -49,7 +49,5 @@ public class Member {
         for(MemberObserver observer : this.getObservers()){
             observer.memberRestricted(this);
         }
-
     }
-
 }

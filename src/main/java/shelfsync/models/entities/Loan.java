@@ -43,5 +43,4 @@ public class Loan {
 
     @Column(name = "return_date")
     private LocalDateTime returnDate;
-
 }

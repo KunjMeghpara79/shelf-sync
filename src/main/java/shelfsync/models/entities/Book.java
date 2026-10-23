@@ -28,5 +28,4 @@ public class Book {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "book_data_id", nullable = false)
     private BookData bookData;
-
 }
