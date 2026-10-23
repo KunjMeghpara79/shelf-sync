@@ -70,7 +70,6 @@ public class MemberServiceTests {
         when(memberRepository.findByMemberEmail("kunj@gmail.com"))
                 .thenReturn(Optional.of(member));
         when(loanRepository.findByLoanStatusInAndMember(List.of(LoanStatus.PAID),member)).thenReturn(List.of());
-
         System.out.println(memberService.getLoanHistory());
     }
 
